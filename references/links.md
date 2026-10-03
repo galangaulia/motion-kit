@@ -5,7 +5,7 @@
 - [Remotion docs](https://www.remotion.dev/docs) · [Remotion AI skills](https://remotion.dev/docs/ai/skills)
 
 ## Tools to learn from
-- [Barty-Bart/motion-graphics](https://github.com/Barty-Bart/motion-graphics) (MIT) — `/motion-broll`: transcript-timed B-roll and transparent ProRes panels for talking-head video; motion blur via sub-frames.
+- [Barty-Bart/motion-graphics](https://github.com/Barty-Bart/motion-graphics) (MIT) — `/motion-broll`: transcript-timed B-roll and transparent ProRes panels for talking-head video; motion blur via sub-frames. Copied into `.claude/skills/motion-broll`.
 - Repos named in the article (not reviewed yet): JohnHeibel/PDoomVideo, JohnHeibel/ClaudeAnimationBase, buildwithhanif/claude-animation-skill, heygen-com/hyperframes, guanmo-ai/awesome-ai-motion, athemeroy/awesome-opus-5-5-videos.
 
 ## Where to find reference films

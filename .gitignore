@@ -26,3 +26,13 @@ package-lock.json
 # Claude Code local state; the shared skill in .claude/skills is committed.
 .claude/scheduled_tasks.lock
 .claude/settings.local.json
+
+# Edits (/motion-broll): the clips, plan and timing are committed; footage,
+# renders and the per-edit Playwright install are not.
+edits/*/inputs/
+edits/*/work/
+edits/*/dist/
+edits/*/out/
+edits/*/node_modules/
+edits/*/package.json
+edits/*/package-lock.json

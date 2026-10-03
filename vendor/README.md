@@ -7,7 +7,7 @@ all rights reserved: read it, never copy from it.
 
 | Folder | Source | Licence | Use |
 |---|---|---|---|
-| `motion-graphics/` | https://github.com/Barty-Bart/motion-graphics | MIT | Talking-head B-roll (`/motion-broll`). Reuse with its LICENSE. |
+| `motion-graphics/` | https://github.com/Barty-Bart/motion-graphics | MIT | Upstream of `.claude/skills/motion-broll`. Clone it only to update that copy (see its `UPSTREAM.md`). |
 
 ```bash
 git clone https://github.com/Barty-Bart/motion-graphics vendor/motion-graphics
