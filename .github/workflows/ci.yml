@@ -1,0 +1,54 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: tests, types, scaffold (Node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        node: [22, 24]
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ matrix.node }}
+      # No lockfile in the repo (it would list private studio/ films); film
+      # dependencies that matter are pinned exactly in each package.json.
+      - run: npm install --no-audit --no-fund
+      - run: npm test
+      - run: npm run typecheck -w @films/tally-demo
+      - name: Scaffold a film from the template and typecheck it
+        run: |
+          npm run new -- ci-smoke --brand example
+          npm run typecheck -w @films/ci-smoke
+
+  render:
+    name: render + review the demo
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - run: npm install --no-audit --no-fund
+      - run: npm run render -w @films/tally-demo
+      - run: npm run review -w @films/tally-demo
+      - name: Check the review produced its sheets
+        run: |
+          dir=$(ls -d films/tally-demo/out/review/*/ | head -1)
+          for f in contact.png phone.png report.md; do test -s "$dir$f" || { echo "missing $dir$f"; exit 1; }; done
+          echo "ok: $dir"
