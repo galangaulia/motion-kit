@@ -1,0 +1,28 @@
+node_modules/
+.DS_Store
+
+# Renders, review sheets and extracted audio are reproducible: regenerate, don't commit.
+films/*/out/
+
+# Synthesized by each film's `npm run audio` (deterministic). A licensed track you
+# drop in by hand must be committed explicitly: git add -f.
+films/*/public/audio/
+
+# Third-party kits are read-only references, fetched by hand (see vendor/README.md).
+vendor/*
+!vendor/README.md
+
+# Big reference media stays local; links.md and notes are committed.
+references/media/
+
+# Private work (brands, films) is its own git repo, laid out like the kit.
+studio/
+CLAUDE.local.md
+
+# The lockfile lists every workspace, studio/ films included, so it stays local.
+# Film dependencies that matter (remotion, @remotion/*) are pinned exactly.
+package-lock.json
+
+# Claude Code local state; the shared skill in .claude/skills is committed.
+.claude/scheduled_tasks.lock
+.claude/settings.local.json

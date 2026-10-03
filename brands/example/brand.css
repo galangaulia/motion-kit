@@ -1,0 +1,49 @@
+/* Tally — a fictional demo brand. A real brand points the --film-* roles at
+   tokens synced from its product repo (see brands/_blank); Tally has no product
+   repo, so its few tokens live here. */
+
+:root {
+  --tally-paper: #f4f1ea;
+  --tally-white: #ffffff;
+  --tally-ink: #16181d;
+  --tally-ink-2: #5d6370;
+  --tally-line: #e2ddd2;
+  --tally-green: #1f9d6b;
+
+  --film-bg: var(--tally-paper);
+  --film-card: var(--tally-white);
+  --film-ink: var(--tally-ink);
+  --film-ink-2: var(--tally-ink-2);
+  --film-accent: var(--tally-green);
+  --film-on-accent: var(--tally-white);
+  --film-line: var(--tally-line);
+  --film-font-display: 'Geist', system-ui, sans-serif;
+  --film-font-ui: 'Geist', system-ui, sans-serif;
+  --film-font-mono: 'Geist Mono', ui-monospace, monospace;
+}
+
+.tally-logotype {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--film-font-display);
+  font-weight: 800;
+  font-size: 26px;
+  letter-spacing: -0.03em;
+  color: var(--film-ink);
+}
+
+.tally-mark {
+  display: grid;
+  grid-template-columns: repeat(3, 5px);
+  gap: 3px;
+  align-items: end;
+  height: 22px;
+}
+
+.tally-mark i {
+  display: block;
+  width: 5px;
+  border-radius: 2px;
+  background: var(--film-accent);
+}

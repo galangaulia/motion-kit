@@ -1,0 +1,15 @@
+{
+  "name": "@motion-kit/core",
+  "private": true,
+  "description": "Springs, beat grid, entrances and font loading for Remotion films.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./springs": "./src/springs.ts",
+    "./beats": "./src/beats.ts"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "remotion": "4.0.532"
+  }
+}

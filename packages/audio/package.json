@@ -1,0 +1,9 @@
+{
+  "name": "@motion-kit/audio",
+  "private": true,
+  "description": "Dependency-free sound for films: synth voices, WAV I/O, loudness metering, and a mixdown with sidechain ducking, limiting and LUFS normalization.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.mjs"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "name": "Tally",
+  "url": "https://example.com",
+  "promise": "A habit tracker that fits in one tap a day.",
+  "hook": "Streaks, not spreadsheets.",
+  "cta": "Try Tally · example.com",
+  "audience": "People who have quit three habit apps already. Watching in a feed, mostly muted.",
+  "voice": "Plain and warm. Short sentences, second person, no exclamation marks, no productivity jargon.",
+  "proof": "Tally is a fictional demo brand: no customers, numbers or quotes exist, so none may appear on screen.",
+  "motion": "Defaults: CLAUDE.md.",
+  "colors": {
+    "bg": "var(--tally-paper)",
+    "card": "var(--tally-white)",
+    "ink": "var(--tally-ink)",
+    "ink2": "var(--tally-ink-2)",
+    "accent": "var(--tally-green)"
+  },
+  "fonts": {
+    "display": "Geist",
+    "ui": "Geist",
+    "mono": "Geist Mono"
+  },
+  "deliver": {
+    "to": "~/Videos/Tally",
+    "note": "Finished films are copied here by `npm run deliver -- <film>` (one folder per film)."
+  }
+}

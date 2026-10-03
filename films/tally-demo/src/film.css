@@ -1,0 +1,76 @@
+/* Film styles. Colours and faces come only from the brand's --film-* roles
+   (brands/<brand>/brand.css). Sizes are written for the 540 square and scale
+   with --u, which Film.tsx sets from the composition size. */
+
+.film-stage {
+  background: var(--film-bg);
+  color: var(--film-ink);
+  font-family: var(--film-font-ui);
+  -webkit-font-smoothing: antialiased;
+}
+
+.film-center {
+  align-items: center;
+  justify-content: center;
+}
+
+.film-hook {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0 calc(14px * var(--u));
+  max-width: 90%;
+  font-family: var(--film-font-display);
+  font-size: calc(56px * var(--u));
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+}
+
+.film-hook-word {
+  display: inline-block;
+}
+
+.film-box {
+  position: relative;
+  overflow: hidden;
+  background: var(--film-card);
+  border: 1px solid var(--film-line);
+}
+
+.film-box-accent {
+  background: var(--film-accent);
+  border-color: var(--film-accent);
+}
+
+.film-rows {
+  display: flex;
+  flex-direction: column;
+  gap: calc(14px * var(--u));
+  padding: calc(28px * var(--u));
+}
+
+.film-row {
+  display: flex;
+  align-items: center;
+  gap: calc(12px * var(--u));
+  font-size: calc(18px * var(--u));
+  font-weight: 600;
+}
+
+.film-row-dot {
+  width: calc(12px * var(--u));
+  height: calc(12px * var(--u));
+  border-radius: 50%;
+  background: var(--film-accent);
+}
+
+.film-cta {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: calc(18px * var(--u));
+  font-weight: 700;
+  color: var(--film-on-accent);
+}

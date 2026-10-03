@@ -1,0 +1,13 @@
+/* Film roles every template reads. Point each at this brand's tokens
+   (synced into tokens.css) — never at raw values copied from a screenshot. */
+:root {
+  --film-bg: #ffffff;
+  --film-card: #ffffff;
+  --film-ink: #111111;
+  --film-ink-2: #555555;
+  --film-accent: #0055ff;
+  --film-on-accent: #ffffff;
+  --film-line: #e5e5e5;
+  --film-font-display: 'Display', system-ui, sans-serif;
+  --film-font-ui: 'Display', system-ui, sans-serif;
+}

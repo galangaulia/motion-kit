@@ -1,0 +1,34 @@
+{
+  "name": "",
+  "url": "",
+  "promise": "What the product does for whom, in one sentence.",
+  "hook": "The problem in five words or fewer.",
+  "cta": "",
+  "audience": "Who watches, where (feed, sound on/off).",
+  "voice": "How the brand talks. Words it never uses.",
+  "proof": "What may be claimed on screen, and what must never be invented.",
+  "motion": "Defaults: CLAUDE.md. Note any brand-specific motion here.",
+  "colors": {
+    "bg": "",
+    "card": "",
+    "ink": "",
+    "ink2": "",
+    "accent": ""
+  },
+  "fonts": {
+    "display": "",
+    "ui": "",
+    "mono": ""
+  },
+  "sync": {
+    "root": "~/dev/<product-repo>",
+    "files": {
+      "path/in/product/repo/tokens.css": "tokens.css",
+      "path/to/Display.woff2": "fonts/Display.woff2"
+    }
+  },
+  "deliver": {
+    "to": "~/Videos/<brand>",
+    "note": "Finished films are copied here by `npm run deliver -- <film>` (one folder per film)."
+  }
+}
