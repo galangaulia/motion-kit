@@ -9,7 +9,7 @@
 <p align="center">
   <a href="films/tally-demo/preview.mp4">Watch with sound</a> ·
   <a href="films/tally-demo/src/Film.tsx">its code</a> ·
-  <a href="films/tally-demo/review_log.md">the 8 critic rounds it took</a>
+  <a href="films/tally-demo/review_log.md">its critic rounds</a>
 </p>
 
 A small motion studio: films made in code with [Remotion](https://remotion.dev),
