@@ -82,7 +82,8 @@ export function Film() {
   const hookLong = (tall ? 64 : 66) * u
 
   // The one container: size and radius track through each shot, never cut.
-  const morphAt = g.hit(CTA.from, 3)
+  // The shrink starts 5 frames ahead of beat 12 so the emptied card never holds still.
+  const morphAt = g.hit(CTA.from, 5)
   const box = {
     w: m.track(frame, [[0, 0], [g.hit(PRODUCT.from), cardW], [morphAt, pillW]]),
     h: m.track(frame, [
@@ -95,13 +96,14 @@ export function Film() {
     r: m.track(frame, [[0, 0], [g.hit(PRODUCT.from), 22 * u], [morphAt, pillH / 2]]),
     y: m.track(frame, [[0, 0], [morphAt, pillY]]),
   }
-  // Colour changes with the shape, on a quicker spring so the pill is green early.
-  const accent = Math.round(clamp01(m.progress(frame, morphAt, 'snappy')) * 100)
+  // Colour follows the shape two frames later on a quicker spring: the two read as one
+  // change, and the pill is green early.
+  const accent = Math.round(clamp01(m.progress(frame, morphAt + 2, 'snappy')) * 100)
   const breathe = 1 + 0.012 * g.pulse(frame - g.beat(PRODUCT.from)) * (frame < g.beat(CTA.from) ? 1 : 0)
   const press = m.track(frame, [[0, 1], [g.hit(PRESS_AT), 0.92, 'snappy'], [g.hit(PRESS_AT) + 6, 1, 'snappy']])
   // Rows lift out one after another just before the morph; the label waits until the pill is nearly green.
   const rowsOut = morphAt - 8
-  const labelAt = morphAt + 8
+  const labelAt = morphAt + 5
   const label = m.progress(frame, labelAt, 'snappy')
   const logoRise = m.progress(frame, g.hit(CTA.from + 1, 6), 'heavy')
   const urlRise = m.progress(frame, g.hit(URL_AT, 6), 'heavy')

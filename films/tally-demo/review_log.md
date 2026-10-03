@@ -164,3 +164,35 @@ Left for a later pass (none blocks shipping, per the critic):
 1. f176–178: one unchanged white card frame, then the colour moves ahead of the size; start the shrink a couple of frames earlier.
 2. f188–191: the "Try Tally" label arrives after the pill has settled; bring it in while the pill is still moving.
 3. f0 cuts "Streaks," at its mask; use a later poster frame where the platform allows.
+
+## Round 9 — 2026-10-03 (polish)
+
+The three notes left after round 8:
+- The shrink starts 5 frames ahead of beat 12 and the colour follows 2 frames later, so the emptied card never holds still.
+- The "Try Tally" label comes in while the pill is still moving (5 frames earlier than before).
+- "Streaks," is fully up on frame 0, so a poster taken from the first frame shows it whole.
+
+| Format | Stop | Read | Change | Moves | Layout | Brand | Sound |
+|---|---|---|---|---|---|---|---|
+| 1:1 | 7 | 9 | 9 | 9 | 8 | 9 | 8 |
+| 9:16 | 7 | 9 | 9 | 9 | 7 | 9 | 8 |
+| 16:9 | 7 | 8 | 9 | 9 | 7 | 9 | 8 |
+
+Verdict: do not ship. Moves rose to 9 (the earlier shrink and label worked). Stop fell to 7 because "Streaks," now sits still from f0 to f12: the round-8 poster-frame note and this critic pull in opposite directions, so the frame-0 change is reverted. Layout 9:16 / 16:9 was not changed since round 8 (8 / 8 then); read as critic variance. Its notes (9:16 band ≈ 38 % of the height, 16:9 card wider than its copy) are logged for a later pass.
+
+Fixed (for round 10):
+- "Streaks," rises from frame 0 again (6-frame lead like the other words).
+
+## Round 10 — 2026-10-03
+
+New critic subagent, all three formats. Verdict: do not ship (Stop only).
+
+| Format | Stop | Read | Change | Moves | Layout | Brand | Sound |
+|---|---|---|---|---|---|---|---|
+| 1:1 | 7 | 8 | 9 | 8 | 8 | 9 | 8 |
+| 9:16 | 7 | 9 | 9 | 8 | 8 | 9 | 8 |
+| 16:9 | 7 | 8 | 9 | 8 | 8 | 9 | 8 |
+
+Scores have plateaued: the hook is the same as in round 8 (Stop 8 then), so Stop now swings 7–8 between critics. Its notes for a bigger change: show the product before 2 s (open the card on beat 3), make the tap a visible press or pointer, scale the 1:1 card up and make the logotype the hero. Left to the film's owner (CLAUDE.md gate 4).
+
+Owner's call (2026-10-03): ship this version. Scores have plateaued; every score but Stop is 8+, and the hook is unchanged from round 8.
