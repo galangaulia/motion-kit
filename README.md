@@ -1,5 +1,17 @@
 # motion-kit
 
+[![ci](https://github.com/galangaulia/motion-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/galangaulia/motion-kit/actions/workflows/ci.yml)
+
+<p align="center">
+  <img src="films/tally-demo/preview.gif" width="432" alt="Demo film: the words 'Streaks, not spreadsheets.' rise one per beat, a card of three habits lands and each is tapped to a check, then the card morphs into a green 'Try Tally' pill with the logo and example.com.">
+</p>
+
+<p align="center">
+  <a href="films/tally-demo/preview.mp4">Watch with sound</a> ·
+  <a href="films/tally-demo/src/Film.tsx">its code</a> ·
+  <a href="films/tally-demo/review_log.md">the 8 critic rounds it took</a>
+</p>
+
 A small motion studio: films made in code with [Remotion](https://remotion.dev),
 on shared springs, a beat grid, synthesized sound and a scored critique loop.
 Open [Claude Code](https://claude.com/claude-code) in this folder and
@@ -22,7 +34,7 @@ brands/
   example/              Tally, a fictional brand to try the kit with (Geist, OFL)
   _blank/               copy this for a new brand
 films/
-  tally-demo/           8 s demo on the example brand: 1:1, 9:16, 16:9
+  tally-demo/           8 s demo on the example brand: 1:1, 9:16, 16:9 (preview.gif / .mp4)
 templates/
   film/                 starter film: 3 formats, springs, beats, soundtrack
   brief.md · shotlist.md · review_log.md · style_guide.md
@@ -34,7 +46,7 @@ scripts/                new-film, brand-sync, deliver
 
 ## Setup
 
-Node 22.6+ (Node runs the `.ts` timeline files directly). No ffmpeg or Python
+Node 22.18+ (it runs the `.ts` timeline files directly, no build step). No ffmpeg or Python
 needed: Remotion ships its own ffmpeg, and the audio and review tools are pure
 Node (`sharp` for contact sheets).
 

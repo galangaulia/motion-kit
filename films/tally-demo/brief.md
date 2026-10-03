@@ -14,6 +14,7 @@ People who have quit habit apps before; social feeds, mostly muted. (Demo of the
 ## Brand
 - Brand: `brands/example` (voice, proof rules, CTA in brand.json)
 - Claims allowed on screen: none. Tally is fictional; the film shows only what the product does.
+- Product UI: Tally has no product, so the habit card is a **recreated UI** drawn for this demo, not a capture.
 - Never show or say: numbers, customers, quotes, logos of other companies.
 
 ## References
@@ -23,8 +24,8 @@ None: the starter's grammar (one container that morphs from card to CTA).
 | Beats | Job | What the viewer sees |
 |---|---|---|
 | 0–4 | Stop the scroll | "Streaks, not spreadsheets." one word per beat |
-| 4–12 | Meet the product, watch it work | A card with today's three habits, one per beat |
-| 12–16 | Know where to go | The card becomes the "Try Tally" pill; logo lands |
+| 4–12 | Meet the product, watch it work | Today's three habits land, then each is tapped to a check: one tap a day |
+| 12–16 | Know where to go | The card becomes the "Try Tally" pill; logo and example.com land |
 
 No proof row: Tally is fictional and has no numbers to show.
 

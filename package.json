@@ -15,6 +15,6 @@
     "deliver": "node scripts/deliver.mjs"
   },
   "engines": {
-    "node": ">=22.6"
+    "node": ">=22.18"
   }
 }

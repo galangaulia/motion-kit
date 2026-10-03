@@ -38,29 +38,29 @@
   border: 1px solid var(--film-line);
 }
 
-.film-box-accent {
-  background: var(--film-accent);
-  border-color: var(--film-accent);
-}
-
 .film-rows {
+  position: absolute;
+  inset: 0;
   display: flex;
   flex-direction: column;
-  gap: calc(14px * var(--u));
-  padding: calc(28px * var(--u));
+  justify-content: center;
+  gap: calc(18px * var(--u));
+  padding: 0 calc(32px * var(--u));
 }
 
 .film-row {
   display: flex;
   align-items: center;
-  gap: calc(12px * var(--u));
-  font-size: calc(18px * var(--u));
+  gap: calc(14px * var(--u));
+  font-size: calc(26px * var(--u));
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .film-row-dot {
-  width: calc(12px * var(--u));
-  height: calc(12px * var(--u));
+  flex-shrink: 0;
+  width: calc(16px * var(--u));
+  height: calc(16px * var(--u));
   border-radius: 50%;
   background: var(--film-accent);
 }
@@ -70,7 +70,7 @@
   inset: 0;
   display: grid;
   place-items: center;
-  font-size: calc(18px * var(--u));
+  font-size: calc(28px * var(--u));
   font-weight: 700;
   color: var(--film-on-accent);
 }

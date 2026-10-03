@@ -5,9 +5,9 @@ src/timeline.ts); 4 beats = 1 bar.
 
 | # | Beats | On screen | Motion (preset) | Sound cue | Into next shot |
 |---|---|---|---|---|---|
-| 1 | 0–4 | "Streaks, / not / spreadsheets." one word per beat, huge | enter `heavy`, leave up on the bar line | rising note per word | the card springs open where the words were |
-| 2 | 4–12 | Card with three habits; rows land on beats 5, 6, 7; card breathes with the kick | card `default`, rows `snappy` | whoosh on the card, tick per row | same card, never cut |
-| 3 | 12–16 | Card morphs into a green "Try Tally" pill; logotype lands under it | morph `snappy`, logo `heavy` | whoosh into the morph, chime as the logo lands | end (held until the last frame) |
+| 1 | 0–4 | "Streaks, / not / spreadsheets." stacked, one word per line and per beat, "Streaks," in green, the long word sized to the frame | each word rises out of its line mask on `heavy`, no fade; on 3.75 the block lifts off the top on `heavy`, fully opaque | rising note per word | the card springs open where the words were |
+| 2 | 4–12 | Card opens on beat 4 as the hook lifts away; habits land on the off-beats 4.5–6.5 with empty rings; beats 8–10 each row is pressed and its ring fills to a check with one spreading ring for the tap; card breathes with the kick | card `default`, rows and checks `snappy` | whoosh on the card, note per row, tick per check | same card, never cut |
+| 3 | 12–16 | Rows lift out; the card morphs (size and colour together) into the green "Try Tally" pill, travelling up into its slot; the logotype (hero size) rises out of a mask (13), "example.com" rises under it (14), the pill takes one press (15) | morph `default` with colour on `snappy`, logo and URL `heavy`, press `snappy` | whoosh into the morph, chime on the logo, soft note on the URL, click on the press | end: something new on every beat to the last frame |
 
 Checks before asking for approval:
 - [x] Hook lands inside 2 s

@@ -16,19 +16,28 @@
 
 .film-hook {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0 calc(14px * var(--u));
-  max-width: 90%;
+  flex-direction: column;
+  align-items: flex-start;
   font-family: var(--film-font-display);
-  font-size: calc(56px * var(--u));
   font-weight: 800;
-  letter-spacing: -0.035em;
-  line-height: 1.05;
+  letter-spacing: -0.045em;
+  line-height: 0.98;
+}
+
+/* Each hook word rises inside its own line; the padding keeps descenders unclipped. */
+.film-hook-line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
 }
 
 .film-hook-word {
   display: inline-block;
+}
+
+.film-hook-accent {
+  color: var(--film-accent);
 }
 
 .film-box {
@@ -38,31 +47,31 @@
   border: 1px solid var(--film-line);
 }
 
-.film-box-accent {
-  background: var(--film-accent);
-  border-color: var(--film-accent);
-}
-
 .film-rows {
+  position: absolute;
+  inset: 0;
   display: flex;
   flex-direction: column;
-  gap: calc(14px * var(--u));
-  padding: calc(28px * var(--u));
+  justify-content: flex-start;
 }
+
 
 .film-row {
   display: flex;
   align-items: center;
-  gap: calc(12px * var(--u));
-  font-size: calc(18px * var(--u));
-  font-weight: 600;
+  gap: calc(16px * var(--u));
+  font-size: var(--row-size);
+  line-height: 1.2;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
 }
 
-.film-row-dot {
-  width: calc(12px * var(--u));
-  height: calc(12px * var(--u));
-  border-radius: 50%;
-  background: var(--film-accent);
+.film-check {
+  flex-shrink: 0;
+  overflow: visible;
+  width: 1.08em;
+  height: 1.08em;
 }
 
 .film-cta {
@@ -70,7 +79,21 @@
   inset: 0;
   display: grid;
   place-items: center;
-  font-size: calc(18px * var(--u));
-  font-weight: 700;
+  font-size: var(--cta-size);
+  font-weight: 750;
+  letter-spacing: -0.02em;
   color: var(--film-on-accent);
+}
+
+/* A one-line mask: its content rises into view from below. */
+.film-mask {
+  overflow: hidden;
+  padding: 4px 6px;
+}
+
+.film-url {
+  font-family: var(--film-font-ui);
+  font-size: calc(24px * var(--u));
+  font-weight: 500;
+  color: var(--film-ink-2);
 }
