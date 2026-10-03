@@ -13,6 +13,7 @@
 import { spawnSync } from 'node:child_process'
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
+import { pathToFileURL } from 'node:url'
 import { join, resolve } from 'node:path'
 import { parseArgs } from 'node:util'
 import { integratedLufs, peakDb, readWav } from '@motion-kit/audio'
@@ -48,7 +49,12 @@ const tmp = mkdtempSync(join(tmpdir(), 'motion-review-'))
 process.on('exit', () => rmSync(tmp, { recursive: true, force: true }))
 
 console.log('bundling…')
-const serveUrl = await bundle({ entryPoint: resolve(args.entry), outDir: join(tmp, 'bundle') })
+// A film that customises webpack (e.g. to render a product's own components)
+// keeps the override in webpack-override.mjs next to its package.json; the
+// CLI picks it up from remotion.config.ts, the review has to load it itself.
+const overridePath = resolve('webpack-override.mjs')
+const webpackOverride = existsSync(overridePath) ? (await import(pathToFileURL(overridePath).href)).default : undefined
+const serveUrl = await bundle({ entryPoint: resolve(args.entry), outDir: join(tmp, 'bundle'), ...(webpackOverride ? { webpackOverride } : {}) })
 const composition = await selectComposition({ serveUrl, id: args.comp })
 const { fps, width, durationInFrames: total } = composition
 // Short pieces get denser sheets: at least ~10 contact frames and ~8 phone frames.
