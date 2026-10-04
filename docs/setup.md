@@ -96,7 +96,8 @@ the `/reel` skill load on their own. Other agents start from `AGENTS.md`.
 
 ## Platforms
 
-CI renders and reviews a film on every engine on each of these:
+Each of these renders and reviews a film on every engine: Linux, Windows and
+the Intel Mac on CI for every change, Apple Silicon on the Mac the kit is made on.
 
 | | Remotion | HyperFrames | Manim |
 |---|---|---|---|
