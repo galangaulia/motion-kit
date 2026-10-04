@@ -6,7 +6,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { crc32, deflateSync } from 'node:zlib'
 import { buffer, writeWav } from '../audio/src/index.mjs'
-import { checkSize, decodeFrames, encode, extractAudio, has, mux, probe, still, tool } from './src/index.mjs'
+import { checkSize, decodeFrames, encode, extractAudio, has, mux, probe, run, still, tool } from './src/index.mjs'
 
 const tmp = mkdtempSync(join(tmpdir(), 'media-test-'))
 process.on('exit', () => rmSync(tmp, { recursive: true, force: true }))
@@ -47,6 +47,8 @@ for (let i = 0; i < N; i++) writeFileSync(join(tmp, 'frames', `${String(i).padSt
 const clip = join(tmp, 'clip.mp4')
 encode({ input: join(tmp, 'frames', '%03d.png'), output: clip, fps: 30, crf: 0 })
 
+const tags = run('ffprobe', ['-select_streams', 'v:0', '-show_entries', 'stream=color_space,color_primaries,color_transfer', '-of', 'csv=p=0', clip]).toString().trim()
+assert.equal(tags, 'bt709,bt709,bt709', 'encode tags matrix, primaries and transfer as BT.709')
 const info = probe(clip)
 assert.deepEqual([info.width, info.height, info.fps, info.frames], [W, H, 30, N], 'probe reads size, rate and frame count')
 

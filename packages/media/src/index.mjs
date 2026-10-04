@@ -58,7 +58,9 @@ export function extractAudio(video, wav, sampleRate = 48000) {
   return r.status === 0
 }
 
-const BT709 = ['-colorspace', 'bt709', '-color_primaries', 'bt709', '-color_trc', 'bt709']
+// Tagged twice over: newer ffmpeg builds drop the container options when the
+// frames carry no colour properties of their own, but x264's VUI always lands.
+const BT709 = ['-colorspace', 'bt709', '-color_primaries', 'bt709', '-color_trc', 'bt709', '-x264-params', 'colorprim=bt709:transfer=bt709:colormatrix=bt709']
 
 /**
  * Encode frames into a delivery MP4: H.264, yuv420p with BT.709 conversion and
