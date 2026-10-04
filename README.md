@@ -31,9 +31,10 @@ CLAUDE.md               house rules (motion, rhythm, look, sound, gates)
 AGENTS.md · GEMINI.md   the way in for other agents (Codex, Gemini CLI, Cursor, Copilot)
 .claude/skills/reel/    the /reel workflow (films, Remotion), linked from .agents/skills/
 packages/
-  core/                 springs (motion, track, swapAlpha), beat grid, enter/exit, loadFonts
+  core/                 springs (motion, track, release, zoom, swapAlpha), beat grid, enter/exit, Flood, loadFonts
   audio/                synth voices, WAV I/O, BS.1770 loudness, mixdown (duck, limit, -14 LUFS)
-  review/               motion-review: contact sheet, 360 px phone sheet, sound report, scorecard
+  review/               motion-review: contact sheet, 360 px phone sheet with the 9:16 safe zone, key stills,
+                        motion checks on every frame, sound report with true peak, scorecard
 brands/
   example/              Tally, a fictional brand to try the kit with (Geist, OFL)
   _blank/               copy this for a new brand
@@ -67,6 +68,7 @@ cd films/tally-demo && npm run studio   # the demo, live
 npm run new -- my-film --brand example
 cd films/my-film
 npm run studio                 # live preview
+npm run stills                 # key stills, to approve the look first
 npm run render && npm run review
 npm run render:all             # 1:1, 9:16, 16:9
 npm run render:final           # the same with motion blur → out/final/

@@ -5,7 +5,8 @@
 // The film goes next to its brand: films/ for a brand in the kit, studio/films/
 // for a brand in studio/.
 //
-// Then fill brief.md → shotlist.md (get it approved) → build → review loop.
+// Then fill brief.md → shotlist.md (get it approved) → key stills (get them
+// approved) → build → review loop.
 
 import { cpSync, existsSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs'
 import { spawnSync } from 'node:child_process'
@@ -56,6 +57,7 @@ ${rel(dest)} is ready (brand: ${brand}).
 
   cd ${rel(dest)}
   npm run studio      # preview the starter
-  # 1. fill brief.md   2. write shotlist.md and get it approved   3. build
+  # 1. fill brief.md   2. write shotlist.md and get it approved
+  # 2b. npm run stills and get the look approved   3. build
   npm run render && npm run review   # every round, until all scores are 8+
 `)
