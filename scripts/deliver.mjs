@@ -29,9 +29,12 @@ if (!existsSync(finals)) {
   process.exit(1)
 }
 
-// The film's brand is whichever brands/<name> its Root imports.
-const rootSrc = readFileSync(join(filmDir, 'src', 'Root.tsx'), 'utf8')
-const brand = rootSrc.match(/brands\/([\w-]+)/)?.[1]
+// The film's brand: package.json → motionKit.brand, or for Remotion films made
+// before that field, whichever brands/<name> its Root imports.
+const pkgPath = join(filmDir, 'package.json')
+const rootPath = join(filmDir, 'src', 'Root.tsx')
+let brand = existsSync(pkgPath) ? JSON.parse(readFileSync(pkgPath, 'utf8')).motionKit?.brand : undefined
+if (!brand && existsSync(rootPath)) brand = readFileSync(rootPath, 'utf8').match(/brands\/([\w-]+)/)?.[1]
 const base = brand && brandBase(brand)
 if (!base) {
   console.error(`can't tell which brand ${rel(filmDir)} uses`)

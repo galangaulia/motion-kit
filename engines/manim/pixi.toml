@@ -1,0 +1,25 @@
+# The Python side of the Manim engine. motion-manim runs everything through
+# `pixi run --manifest-path engines/manim/pixi.toml …`, so no system Python,
+# cairo or Homebrew is needed: conda-forge ships cairo, pycairo and PyAV
+# (with its own ffmpeg) for macOS and Linux alike. pixi.lock pins them all.
+
+[workspace]
+name = "motion-kit-manim"
+channels = ["conda-forge"]
+platforms = ["osx-arm64", "osx-64", "linux-64", "win-64"]
+
+[dependencies]
+python = "3.12.*"
+cairo = "*"
+pycairo = "*"
+manimpango = "*"
+av = "*"
+pkg-config = "*"
+fonttools = "*"
+brotli-python = "*"
+
+[pypi-dependencies]
+manim = "==0.21.0"
+
+[tasks]
+test = { cmd = "python -m unittest discover -s tests -v", env = { PYTHONPATH = ".", PYTHONUTF8 = "1" } }

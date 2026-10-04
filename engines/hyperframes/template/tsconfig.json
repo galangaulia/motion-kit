@@ -1,0 +1,4 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "include": ["src", "__KIT__/packages/core/src", "__KIT__/engines/hyperframes/src"]
+}

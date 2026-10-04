@@ -1,15 +1,17 @@
 {
   "name": "@motion-kit/review",
   "private": true,
-  "description": "The critique loop's eyes and ears: contact sheet, phone-width sheet with safe zone, key stills, motion checks, loudness + true peak + cue-sync report, scorecard.",
+  "description": "The critique loop's eyes and ears, for any engine: contact sheet, phone-width sheet with safe zone, key stills, motion checks, loudness + true peak + cue-sync report, scorecard.",
   "type": "module",
   "bin": {
     "motion-review": "./src/review.mjs"
   },
+  "exports": {
+    "./video-adapter": "./src/video-adapter.mjs"
+  },
   "dependencies": {
     "@motion-kit/audio": "*",
-    "@remotion/bundler": "4.0.532",
-    "@remotion/renderer": "4.0.532",
+    "@motion-kit/media": "*",
     "sharp": "^0.34.0"
   }
 }

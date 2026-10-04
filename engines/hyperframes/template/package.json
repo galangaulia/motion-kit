@@ -1,0 +1,32 @@
+{
+  "name": "@films/__SLUG__",
+  "private": true,
+  "type": "module",
+  "motionKit": {
+    "engine": "hyperframes",
+    "brand": "__BRAND__"
+  },
+  "scripts": {
+    "audio": "node scripts/build-audio.mjs",
+    "clips": "motion-manim clips",
+    "build": "motion-hf build",
+    "studio": "npm run audio && npm run clips && motion-hf preview",
+    "preview": "npm run audio && npm run clips && motion-hf preview",
+    "render": "npm run audio && npm run clips && motion-hf render Square",
+    "render:all": "npm run audio && npm run clips && motion-hf render Square Vertical Wide",
+    "render:final": "npm run audio && npm run clips && motion-hf render Square Vertical Wide --final",
+    "review": "motion-review --comp Square --video out/square.mp4",
+    "stills": "motion-review --comp Square --stills",
+    "typecheck": "tsc -p ."
+  },
+  "dependencies": {
+    "@motion-kit/audio": "*",
+    "@motion-kit/core": "*",
+    "@motion-kit/hyperframes": "*"
+  },
+  "devDependencies": {
+    "@motion-kit/manim": "*",
+    "@motion-kit/review": "*",
+    "typescript": "^5.6.0"
+  }
+}

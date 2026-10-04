@@ -21,10 +21,11 @@ render) does three things:
 
 It is deterministic: the same script always writes the same file.
 
-What a new film starts with (from `templates/film`): a I–V–vi–IV progression in
-C at 120 BPM, a rising `pluck` note per hook word and per row, a `sweep` whoosh
-into each shot, and a brighter note on the CTA. That's a starting point, not a
-house sound: change all of it.
+What a new film starts with (from `templates/shared/scripts/build-audio.mjs`,
+the same for every engine): a I–V–vi–IV progression in C at 120 BPM, a rising
+`pluck` note per hook word and per row, a `sweep` whoosh into each shot, and a
+brighter note on the CTA. That's a starting point, not a house sound: change
+all of it.
 
 ## The voices
 
@@ -52,7 +53,8 @@ empty stereo buffer to draw into.
    `buf` built from the voices, and a `gain`.
 4. **Your own samples:** put WAV files in `films/<slug>/sound/` (committed with
    the film) and load them with `readWav()`, then use them as a cue's `buf`.
-   Convert other formats first: `npx remotion ffmpeg -i click.mp3 click.wav`.
+   Convert other formats first: `ffmpeg -i click.mp3 click.wav` (or, without an
+   ffmpeg of your own, Remotion's: `npx remotion ffmpeg -i click.mp3 click.wav`).
 5. **A licensed music track as the bed:** same folder, `readWav()` it and pass it
    as `bed`. Write its source and licence in the film's `brief.md`.
 6. **Mix:** `mixdown()` takes `bedGain`, `duck: { depth, attack, release }`,

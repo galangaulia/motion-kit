@@ -2,6 +2,10 @@
   "name": "@films/tally-demo",
   "private": true,
   "type": "module",
+  "motionKit": {
+    "engine": "remotion",
+    "brand": "example"
+  },
   "scripts": {
     "audio": "node scripts/build-audio.mjs",
     "studio": "npm run audio && remotion studio",
@@ -22,6 +26,7 @@
     "remotion": "4.0.532"
   },
   "devDependencies": {
+    "@motion-kit/remotion": "*",
     "@motion-kit/review": "*",
     "@types/react": "^19.0.0",
     "typescript": "^5.6.0"

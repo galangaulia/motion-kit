@@ -1,0 +1,16 @@
+{
+  "name": "@motion-kit/manim",
+  "private": true,
+  "description": "Manim as a motion-kit engine: whole films (src/film.py) or transparent clips (manim/<name>.py) for Remotion and HyperFrames films, drawn from the frame number by motionkit's FrameScene and run through pixi.",
+  "type": "module",
+  "bin": {
+    "motion-manim": "./bin/motion-manim.mjs"
+  },
+  "exports": {
+    "./review": "./review.mjs"
+  },
+  "dependencies": {
+    "@motion-kit/media": "*",
+    "@motion-kit/review": "*"
+  }
+}

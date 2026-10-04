@@ -20,6 +20,16 @@
     "ui": "",
     "mono": ""
   },
+  "css": [
+    "brand.css"
+  ],
+  "fontFiles": [
+    {
+      "family": "Display",
+      "src": "fonts/Display.woff2",
+      "weight": "100 900"
+    }
+  ],
   "sync": {
     "root": "~/dev/<product-repo>",
     "files": {

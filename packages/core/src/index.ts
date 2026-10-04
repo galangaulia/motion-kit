@@ -3,7 +3,7 @@ export type { Motion, Preset, PresetName, SpringShape, TrackKey } from './spring
 export { grid } from './beats'
 export type { BeatGrid } from './beats'
 export { enter, exit } from './enter'
-export type { EnterFrom } from './enter'
+export type { EnterFrom, MoveStyle } from './enter'
 export { loadFonts } from './fonts'
 export type { FontSource } from './fonts'
 export { DotField, Flood, Grain, GridField, RingPulse, Streaks } from './fx'
