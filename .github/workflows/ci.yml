@@ -49,12 +49,17 @@ jobs:
           node-version: 24
       - run: npm install --no-audit --no-fund
       - run: npm run render -w @films/tally-demo
-      - run: npm run review -w @films/tally-demo
+      # --strict fails the job on flashes past WCAG 2.3.1 or a true peak over −1 dBTP.
+      - run: npm run review -w @films/tally-demo -- --strict
+      - run: npm run stills -w @films/tally-demo
       - name: Render one motion-blurred Final frame
         working-directory: films/tally-demo
         run: npx remotion still Square-Final out/final-still.png --frame=58 --scale=0.5
-      - name: Check the review produced its sheets
+      - name: Check the review and the stills produced their sheets
         run: |
-          dir=$(ls -d films/tally-demo/out/review/*/ | head -1)
+          dir=$(ls -d films/tally-demo/out/review/*-Square/ | head -1)
           for f in contact.png phone.png report.md; do test -s "$dir$f" || { echo "missing $dir$f"; exit 1; }; done
-          echo "ok: $dir"
+          grep -q '^| Glitches' "${dir}report.md" || { echo "no motion checks in ${dir}report.md"; exit 1; }
+          stills=$(ls -d films/tally-demo/out/review/*-Square-stills/ | head -1)
+          for f in stills.png phone.png report.md; do test -s "$stills$f" || { echo "missing $stills$f"; exit 1; }; done
+          echo "ok: $dir $stills"

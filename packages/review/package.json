@@ -1,7 +1,7 @@
 {
   "name": "@motion-kit/review",
   "private": true,
-  "description": "The critique loop's eyes and ears: contact sheet, phone-width sheet, loudness + cue-sync report, scorecard.",
+  "description": "The critique loop's eyes and ears: contact sheet, phone-width sheet with safe zone, key stills, motion checks, loudness + true peak + cue-sync report, scorecard.",
   "type": "module",
   "bin": {
     "motion-review": "./src/review.mjs"

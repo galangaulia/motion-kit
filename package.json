@@ -10,7 +10,7 @@
   ],
   "scripts": {
     "brand:sync": "node scripts/brand-sync.mjs",
-    "test": "node packages/core/test.mjs && node packages/audio/test.mjs",
+    "test": "node packages/core/test.mjs && node packages/audio/test.mjs && node packages/review/test.mjs",
     "new": "node scripts/new-film.mjs",
     "deliver": "node scripts/deliver.mjs"
   },

@@ -43,3 +43,16 @@ export const CTA_TEXT = 'Try Tally'
 export const URL_TEXT = 'example.com'
 export const URL_AT = 14
 export const PRESS_AT = 15
+
+/**
+ * Key stills (gate 2b): one frame per shot, at the moment it makes its point.
+ * Their look is approved before the rest of the film is animated; render them
+ * with `npm run stills`.
+ */
+export const STILLS = [
+  { frame: g.hit(HOOK.to) - 1, label: 'hook' },
+  { frame: g.hit(POINTER_IN) - 1, label: 'product' },
+  // All three checked and the thumb gone, just before the rows lift out.
+  { frame: g.beat(POINTER_OUT) + 3, label: 'proof' },
+  { frame: TOTAL_FRAMES - 1, label: 'end card' },
+]
