@@ -11,8 +11,8 @@
 import { spawnSync } from 'node:child_process'
 import { copyFileSync, cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
-import { homedir, tmpdir } from 'node:os'
-import { basename, dirname, join, resolve } from 'node:path'
+import { homedir, release, tmpdir } from 'node:os'
+import { basename, dirname, isAbsolute, join, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { mux, tool } from '@motion-kit/media'
 
@@ -28,18 +28,19 @@ export function quietEnv(env = process.env) {
   delete out.GEMINI_API_KEY
   const ff = tool('ffmpeg')
   if (ff.pre.length) throw new Error("HyperFrames needs a full ffmpeg (Remotion's build is too small): install one or set MOTION_KIT_FFMPEG.")
-  if (ff.cmd.startsWith('/')) {
+  if (isAbsolute(ff.cmd)) {
     out.HYPERFRAMES_FFMPEG_PATH = ff.cmd
     const probe = tool('ffprobe')
-    if (probe.cmd.startsWith('/')) out.HYPERFRAMES_FFPROBE_PATH = probe.cmd
+    if (isAbsolute(probe.cmd)) out.HYPERFRAMES_FFPROBE_PATH = probe.cmd
   }
   return out
 }
 
-// The chrome-headless-shell hyperframes 0.8.121 manages (its CHROME_VERSION) —
-// bump with it. Installed into HyperFrames' own cache, and handed to every render
-// and snapshot by path, so no machine falls back to its system Chrome.
-const CHROME = '152.0.7977.30'
+// The chrome-headless-shell hyperframes 0.8.121 manages (its CHROME_VERSION, and
+// the last build macOS 12 runs) — bump with it. Installed into HyperFrames' own
+// cache, and handed to every render and snapshot by path, so no machine falls
+// back to its system Chrome.
+const CHROME = process.platform === 'darwin' && Number.parseInt(release(), 10) < 22 ? '150.0.7871.124' : '152.0.7977.30'
 const CHROME_CACHE = join(homedir(), '.cache', 'hyperframes', 'chrome')
 
 /** The pinned headless shell's path, downloading it first if it isn't cached. */

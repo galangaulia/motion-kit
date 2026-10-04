@@ -6,7 +6,7 @@ import assert from 'node:assert/strict'
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 import sharp from 'sharp'
 import { probe, run } from '@motion-kit/media'
 import { clips } from '../src/project.mjs'
@@ -18,7 +18,7 @@ process.on('exit', () => rmSync(dir, { recursive: true, force: true }))
 mkdirSync(join(dir, 'src'))
 mkdirSync(join(dir, 'manim'))
 writeFileSync(join(dir, 'package.json'), JSON.stringify({ name: '@films/clip-test', type: 'module', motionKit: { engine: 'remotion', brand: 'example' } }))
-writeFileSync(join(dir, 'src', 'timeline.ts'), `import { grid } from ${JSON.stringify(join(KIT, 'packages/core/src/beats.ts'))}
+writeFileSync(join(dir, 'src', 'timeline.ts'), `import { grid } from ${JSON.stringify(pathToFileURL(join(KIT, 'packages/core/src/beats.ts')).href)}
 export const FPS = 30
 export const g = grid(120, FPS)
 export const CLIPS = { dot: { from: 1, to: 3, width: 120, height: 80 } }

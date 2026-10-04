@@ -197,5 +197,6 @@ export async function preview({ dir = process.cwd(), format } = {}) {
   const wav = join(dir, 'public', 'audio', 'soundtrack.wav')
   encode({ input: join(job.out, 'f%05d.png'), fps: f.timeline.FPS, output: target, audio: existsSync(wav) ? wav : undefined, crf: 23, preset: 'veryfast' })
   console.log(target)
-  if (process.platform === 'darwin') spawnSync('open', [target])
+  const opener = { darwin: ['open', [target]], win32: ['cmd', ['/c', 'start', '', target]], linux: ['xdg-open', [target]] }[process.platform]
+  if (opener) spawnSync(opener[0], opener[1], { stdio: 'ignore' })
 }

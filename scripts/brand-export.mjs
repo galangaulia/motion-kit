@@ -12,7 +12,7 @@
 
 import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
-import { dirname, join, relative, resolve } from 'node:path'
+import { dirname, join, relative, resolve, sep } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { brandBase } from './places.mjs'
 
@@ -34,7 +34,8 @@ export function cssFiles(dir, json) {
     const path = join(dir, file)
     if (!existsSync(path)) throw new Error(`${file} is listed in brand.json → css (or @imported) but missing`)
     for (const [, url] of stripComments(readFileSync(path, 'utf8')).matchAll(/@import\s+(?:url\()?\s*['"]?([^'")\s;]+)['"]?\s*\)?[^;]*;/g)) {
-      if (!/^[a-z]+:/i.test(url)) visit(relative(dir, resolve(dirname(path), url)))
+      // Kept with forward slashes: these become hrefs in a page, on Windows too.
+      if (!/^[a-z]+:/i.test(url)) visit(relative(dir, resolve(dirname(path), url)).split(sep).join('/'))
     }
     order.push(file)
   }

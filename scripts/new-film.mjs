@@ -71,7 +71,8 @@ fill(dest)
 
 // Link the new workspace so @motion-kit/* resolve. HyperFrames finds or fetches
 // its own pinned Chrome, so Puppeteer's download is skipped.
-spawnSync('npm', ['install', '--no-audit', '--no-fund'], { cwd: ROOT, stdio: 'inherit', env: { ...process.env, PUPPETEER_SKIP_DOWNLOAD: '1' } })
+// (npm is npm.cmd on Windows, which Node only starts through a shell.)
+spawnSync('npm', ['install', '--no-audit', '--no-fund'], { cwd: ROOT, stdio: 'inherit', shell: process.platform === 'win32', env: { ...process.env, PUPPETEER_SKIP_DOWNLOAD: '1' } })
 
 console.log(`
 ${rel(dest)} is ready (brand: ${brand}, engine: ${engine}).
