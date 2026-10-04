@@ -88,5 +88,5 @@ npm test                              # core + audio sanity checks
 npm run new -- <slug> --brand <name>  # scaffold a film
 npm run brand:sync -- <name>          # refresh tokens/fonts from the product repo
 # inside films/<slug>:
-npm run studio | render | render:all | review | typecheck
+npm run studio | render | render:all | render:final | review | typecheck
 ```

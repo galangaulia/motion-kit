@@ -1,6 +1,7 @@
 import { enter, motion } from '@motion-kit/core'
 import type { CSSProperties } from 'react'
 import { AbsoluteFill, Html5Audio, staticFile, useCurrentFrame, useVideoConfig } from 'remotion'
+import { CameraMotionBlur } from '@remotion/motion-blur'
 import { Logotype } from '../../../brands/example'
 import { CHECKS_AT, CTA, CTA_TEXT, FPS, HOOK, HOOK_OUT, HOOK_WORDS, PRESS_AT, PRODUCT, ROWS, ROWS_AT, URL_AT, URL_TEXT, g } from './timeline'
 
@@ -46,7 +47,11 @@ function Check({ frame, at }: { frame: number; at: number }) {
   )
 }
 
-export function Film() {
+/**
+ * Everything on screen; reads its own frame, so the motion blur can sample it.
+ * `bare` drops the background, which the blurred film paints once underneath.
+ */
+function Scene({ bare = false }: { bare?: boolean }) {
   const frame = useCurrentFrame()
   const { width, height } = useVideoConfig()
   const u = Math.min(width, height) / 540 // 1 at the 540 square
@@ -110,10 +115,9 @@ export function Film() {
 
   return (
     <AbsoluteFill
-      className="film-stage"
+      className={bare ? 'film-stage film-stage-bare' : 'film-stage'}
       style={{ '--u': u, '--row-size': `${rowSize}px`, '--cta-size': `${(tall ? 50 : 34) * u}px` } as CSSProperties}
     >
-      <Html5Audio src={staticFile('audio/soundtrack.wav')} />
       <AbsoluteFill style={zoom === 1 ? undefined : { transform: `scale(${zoom})` }}>
 
         {/* Hook: one word per line, left-aligned block in the middle of the frame. Each
@@ -205,6 +209,30 @@ export function Film() {
           </div>
         </AbsoluteFill>
       </AbsoluteFill>
+    </AbsoluteFill>
+  )
+}
+
+/**
+ * The film. Finals (`blur`) render the scene through a 180° camera shutter for
+ * motion blur (16 samples: fewer leave visible steps on fast moves); the
+ * soundtrack sits outside it so it plays once.
+ */
+export function Film({ blur = false }: { blur?: boolean }) {
+  return (
+    <AbsoluteFill style={{ background: 'var(--film-bg)' }}>
+      <Html5Audio src={staticFile('audio/soundtrack.wav')} />
+      {blur ? (
+        // Only the moving content is blurred: stacking 16 faint copies of a flat
+        // background would drift its colour.
+        <CameraMotionBlur samples={16} shutterAngle={180}>
+          <AbsoluteFill>
+            <Scene bare />
+          </AbsoluteFill>
+        </CameraMotionBlur>
+      ) : (
+        <Scene />
+      )}
     </AbsoluteFill>
   )
 }

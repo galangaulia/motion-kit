@@ -9,6 +9,11 @@
   -webkit-font-smoothing: antialiased;
 }
 
+/* Finals: the background is painted once under the motion blur, not per sample. */
+.film-stage-bare {
+  background: transparent;
+}
+
 .film-center {
   align-items: center;
   justify-content: center;

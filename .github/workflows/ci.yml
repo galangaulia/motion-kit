@@ -8,6 +8,9 @@ on:
 permissions:
   contents: read
 
+# Runners are pinned (not ubuntu-latest) so an image change can't silently
+# break the headless-Chrome render; bump deliberately.
+
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
@@ -15,7 +18,7 @@ concurrency:
 jobs:
   check:
     name: tests, types, scaffold (Node ${{ matrix.node }})
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     strategy:
       matrix:
@@ -37,7 +40,7 @@ jobs:
 
   render:
     name: render + review the demo
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v6
@@ -47,6 +50,9 @@ jobs:
       - run: npm install --no-audit --no-fund
       - run: npm run render -w @films/tally-demo
       - run: npm run review -w @films/tally-demo
+      - name: Render one motion-blurred Final frame
+        working-directory: films/tally-demo
+        run: npx remotion still Square-Final out/final-still.png --frame=58 --scale=0.5
       - name: Check the review produced its sheets
         run: |
           dir=$(ls -d films/tally-demo/out/review/*/ | head -1)

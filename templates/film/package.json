@@ -7,6 +7,7 @@
     "studio": "npm run audio && remotion studio",
     "render": "npm run audio && remotion render Square out/square.mp4",
     "render:all": "npm run audio && remotion render Square out/square.mp4 && remotion render Vertical out/vertical.mp4 && remotion render Wide out/wide.mp4",
+    "render:final": "npm run audio && remotion render Square-Final out/final/__SLUG__-1x1.mp4 && remotion render Vertical-Final out/final/__SLUG__-9x16.mp4 && remotion render Wide-Final out/final/__SLUG__-16x9.mp4",
     "review": "motion-review --comp Square --video out/square.mp4",
     "typecheck": "tsc -p ."
   },
@@ -14,6 +15,7 @@
     "@motion-kit/audio": "*",
     "@motion-kit/core": "*",
     "@remotion/cli": "4.0.532",
+    "@remotion/motion-blur": "4.0.532",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "remotion": "4.0.532"

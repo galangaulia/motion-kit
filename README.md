@@ -67,6 +67,7 @@ cd films/my-film
 npm run studio                 # live preview
 npm run render && npm run review
 npm run render:all             # 1:1, 9:16, 16:9
+npm run render:final           # the same with motion blur → out/final/
 ```
 
 Every timing lives in the film's `src/timeline.ts` (in beats); the picture

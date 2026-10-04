@@ -1,6 +1,7 @@
 import { enter, exit, motion } from '@motion-kit/core'
 import type { CSSProperties } from 'react'
 import { AbsoluteFill, Html5Audio, staticFile, useCurrentFrame, useVideoConfig } from 'remotion'
+import { CameraMotionBlur } from '@remotion/motion-blur'
 import { Logotype } from '../../../brands/__BRAND__'
 import { CTA, FPS, HOOK, HOOK_WORDS, PRODUCT, ROWS_AT, g } from './timeline'
 
@@ -17,7 +18,11 @@ import { CTA, FPS, HOOK, HOOK_WORDS, PRODUCT, ROWS_AT, g } from './timeline'
 const m = motion(FPS)
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v))
 
-export function Film() {
+/**
+ * Everything on screen; reads its own frame, so the motion blur can sample it.
+ * `bare` drops the background, which the blurred film paints once underneath.
+ */
+function Scene({ bare = false }: { bare?: boolean }) {
   const frame = useCurrentFrame()
   const { width, height } = useVideoConfig()
   const u = Math.min(width, height) / 540 // 1 at the 540 square
@@ -37,8 +42,7 @@ export function Film() {
   const press = m.track(frame, [[0, 1], [pressAt, 0.95, 'snappy'], [pressAt + 5, 1, 'snappy']])
 
   return (
-    <AbsoluteFill className="film-stage" style={{ '--u': u } as CSSProperties}>
-      <Html5Audio src={staticFile('audio/soundtrack.wav')} />
+    <AbsoluteFill className={bare ? 'film-stage film-stage-bare' : 'film-stage'} style={{ '--u': u } as CSSProperties}>
 
       {/* Hook */}
       <AbsoluteFill className="film-center">
@@ -87,6 +91,30 @@ export function Film() {
           <Logotype style={enter(m, frame, g.hit(CTA.from + 1), { y: 12 * u, preset: 'heavy' })} />
         </div>
       </AbsoluteFill>
+    </AbsoluteFill>
+  )
+}
+
+/**
+ * The film. Finals (`blur`) render the scene through a 180° camera shutter for
+ * motion blur (16 samples: fewer leave visible steps on fast moves); the
+ * soundtrack sits outside it so it plays once.
+ */
+export function Film({ blur = false }: { blur?: boolean }) {
+  return (
+    <AbsoluteFill style={{ background: 'var(--film-bg)' }}>
+      <Html5Audio src={staticFile('audio/soundtrack.wav')} />
+      {blur ? (
+        // Only the moving content is blurred: stacking 16 faint copies of a flat
+        // background would drift its colour.
+        <CameraMotionBlur samples={16} shutterAngle={180}>
+          <AbsoluteFill>
+            <Scene bare />
+          </AbsoluteFill>
+        </CameraMotionBlur>
+      ) : (
+        <Scene />
+      )}
     </AbsoluteFill>
   )
 }

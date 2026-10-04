@@ -18,9 +18,11 @@ const FORMATS = [
 export function RemotionRoot() {
   return (
     <>
-      {FORMATS.map((f) => (
-        <Composition key={f.id} id={f.id} component={Film} durationInFrames={TOTAL_FRAMES} fps={FPS} width={f.width} height={f.height} />
-      ))}
+      {FORMATS.flatMap((f) => [
+        <Composition key={f.id} id={f.id} component={Film} durationInFrames={TOTAL_FRAMES} fps={FPS} width={f.width} height={f.height} defaultProps={{ blur: false }} />,
+        // The same film with motion blur, for finals (npm run render:final → out/final/).
+        <Composition key={`${f.id}-Final`} id={`${f.id}-Final`} component={Film} durationInFrames={TOTAL_FRAMES} fps={FPS} width={f.width} height={f.height} defaultProps={{ blur: true }} />,
+      ])}
     </>
   )
 }
