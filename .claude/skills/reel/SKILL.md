@@ -66,10 +66,14 @@ npm run render && npm run review
 ```
 
 Open `out/review/<stamp>-<comp>/contact.png`, `phone.png` and `report.md`.
-Then spawn a **fresh critic subagent** (read-only, never saw the build) with
-those paths, the brief's one-liner and CLAUDE.md, and have it score the seven
-criteria with frame-number evidence. Don't self-score: it ran ~2 points high.
-Log each round in `review_log.md`.
+Then spawn **two fresh critic subagents** in parallel (read-only, never saw the
+build, never saw each other or earlier rounds) with those paths, the brief's
+one-liner and CLAUDE.md, and have each score the seven criteria with
+frame-number evidence. A round's score per criterion is the **lower** of the
+two; fix the issues both raise first. One critic's 7-or-8 swings with who is
+judging (the demo film saw Stop go 8, 7, 8, 7 on an unchanged opening); two
+steady it. Don't self-score: it ran ~2 points high. Log both sets and the
+round's score in `review_log.md`.
 Hunt specifically for: dead time (identical neighbouring tiles), text too
 small at 360 px, crossfades or pure fades, overlapping text during swaps, a
 cue whose lift is under ~4 dB, a shot that doesn't change for more than 4 s.

@@ -16,6 +16,7 @@ Read this before touching either.
 - `films/<slug>` one Remotion project per film: brief, shotlist, review log, `src/timeline.ts`, `scripts/build-audio.mjs`
 - `edits/<slug>` one talking-head video per folder, used as `/motion-broll`'s `motion/` folder: `clips/*.html`, `plan.json`, `TIMING.md` are committed; `inputs/` (footage, transcript), `work/`, `dist/`, `out/` and its Playwright install are not
 - `templates/` the film starter + brief / shotlist / review log / style guide
+- `docs/` guides for users of the kit: `brand.md` (bring your own design system), `sound.md` (customize the soundtrack)
 - `vendor/` third-party kits, read-only, git-ignored. Check each one's licence before reusing anything (see `vendor/README.md`); a kit without a licence is reference only.
 - `studio/` optional private work (brands, films, edits) with the same layout, in its own git repo and ignored here. Never `git add -f` anything under it. Edits of a real person's footage belong here, not in the kit.
 
@@ -71,7 +72,7 @@ computable on its own from `useCurrentFrame()`.
 1. Brief (`brief.md`), answered in one round of questions.
 2. Shotlist (`shotlist.md`) — **stop and get it approved before building.**
 3. Build against `timeline.ts`.
-4. Review loop: `npm run render && npm run review`, then look at `contact.png` and `phone.png`. A critic subagent that has never seen the build scores the round, read-only, from the sheets, `report.md` and this file (a builder grading their own work came out about 2 points generous). Fix the handful of issues that cost the most points (no more than three per round), log the round in `review_log.md`, and go again. **A film ships when every criterion scores 8 or more**, unless its owner calls it once the scores stop moving.
+4. Review loop: `npm run render && npm run review`, then look at `contact.png` and `phone.png`. Two critic subagents that have never seen the build (nor each other, nor earlier rounds) score the round in parallel, read-only, from the sheets, `report.md` and this file; the round's score per criterion is the lower of the two. A builder grading their own work came out about 2 points generous, and a single critic's 7-or-8 swings with who is judging. Fix the handful of issues that cost the most points (no more than three per round), log the round in `review_log.md`, and go again. **A film ships when every criterion scores 8 or more**, unless its owner calls it once the scores stop moving.
 5. Finals: every format and look the brief asks for, with motion blur (`npm run render:final` in the film → `out/final/`), then `npm run deliver -- <film>` from the repo root copies them to the brand's delivery folder (`brand.json` → `deliver.to`).
 
 ## Edits

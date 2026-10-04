@@ -45,6 +45,7 @@ references/             links and notes on films worth learning from
 prompts/                prompts that worked
 vendor/                 third-party kits (git-ignored, see vendor/README.md)
 scripts/                new-film, brand-sync, deliver
+docs/                   guides: your own brand, your own sound
 ```
 
 ## Setup
@@ -87,9 +88,14 @@ bash .claude/skills/motion-broll/scripts/setup.sh edits/my-talk   # once per edi
 /motion-broll
 ```
 
+## Guides
+
+- [Bring your own brand](docs/brand.md): the `--film-*` roles, fonts, tokens, logo, syncing from your product repo.
+- [Make the sound yours](docs/sound.md): how a film's soundtrack is built, the synth voices, your own samples or a licensed track.
+
 ## Brands
 
-Copy `brands/_blank` to `brands/<name>`. `brand.json` holds the voice, proof
+Copy `brands/_blank` to `brands/<name>` ([guide](docs/brand.md)). `brand.json` holds the voice, proof
 rules and CTA, plus an optional `sync` map of files to copy from the product
 repo (tokens, fonts, logo) and a `deliver.to` folder for finished films:
 

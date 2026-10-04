@@ -4,8 +4,9 @@ node_modules/
 # Renders, review sheets and extracted audio are reproducible: regenerate, don't commit.
 films/*/out/
 
-# Synthesized by each film's `npm run audio` (deterministic). A licensed track you
-# drop in by hand must be committed explicitly: git add -f.
+# Written by each film's `npm run audio` (deterministic), which empties the
+# folder first. Your own samples or a licensed track go in films/<slug>/sound/,
+# which is committed (see docs/sound.md).
 films/*/public/audio/
 
 # Third-party kits are read-only references, fetched by hand (see vendor/README.md).
