@@ -15,8 +15,8 @@
 A small motion studio: films made in code with [Remotion](https://remotion.dev),
 on shared springs, a beat grid, synthesized sound and a scored critique loop.
 Open [Claude Code](https://claude.com/claude-code) in this folder and
-`CLAUDE.md` + two skills load automatically: `/reel` makes films from nothing,
-`/motion-broll` adds motion-graphic B-roll to a talking-head video you already have.
+`CLAUDE.md` + the `/reel` skill load automatically. For motion-graphic B-roll
+on a talking-head video you already have, see [broll-kit](https://github.com/galangaulia/broll-kit).
 
 ```text
 /reel 15-second teaser for Tally, 1:1 and 9:16, synthesized music
@@ -27,7 +27,6 @@ Open [Claude Code](https://claude.com/claude-code) in this folder and
 ```text
 CLAUDE.md               house rules (motion, rhythm, look, sound, gates)
 .claude/skills/reel/    the /reel workflow (films, Remotion)
-.claude/skills/motion-broll/  B-roll for existing footage (from Barty-Bart/motion-graphics, MIT)
 packages/
   core/                 springs (motion, track, swapAlpha), beat grid, enter/exit, loadFonts
   audio/                synth voices, WAV I/O, BS.1770 loudness, mixdown (duck, limit, -14 LUFS)
@@ -37,7 +36,6 @@ brands/
   _blank/               copy this for a new brand
 films/
   tally-demo/           8 s demo on the example brand: 1:1, 9:16, 16:9 (preview.gif / .mp4)
-edits/                  one talking-head video per folder for /motion-broll, made as needed (footage git-ignored)
 templates/
   film/                 starter film: 3 formats, springs, beats, soundtrack
   brief.md · shotlist.md · review_log.md · style_guide.md
@@ -74,20 +72,6 @@ npm run render:final           # the same with motion blur → out/final/
 Every timing lives in the film's `src/timeline.ts` (in beats); the picture
 and `scripts/build-audio.mjs` both read it, so a retimed shot keeps its sound.
 
-## Add B-roll to a talking-head video
-
-`/motion-broll` turns a video plus its transcript (SRT) into motion-graphic
-clips timed to your words: full-frame cutaways, or transparent ProRes panels
-for empty space beside you, plus a preview cut and a before/after page. It runs
-on its own HTML engine, so it needs Python 3 with numpy and a full ffmpeg build
-with `prores_ks` (Homebrew's works; Remotion's bundled one doesn't).
-
-```bash
-bash .claude/skills/motion-broll/scripts/setup.sh edits/my-talk   # once per edit
-# put the video and its .srt in edits/my-talk/inputs/, then in Claude Code:
-/motion-broll
-```
-
 ## Guides
 
 - [Bring your own brand](docs/brand.md): the `--film-*` roles, fonts, tokens, logo, syncing from your product repo.
@@ -106,7 +90,7 @@ npm run deliver -- <film>      # out/final/*.mp4 → deliver.to/<film>
 
 ## Private work: `studio/`
 
-Client or product films, and edits of your own footage, that you don't want in a public fork can live in
+Client or product films you don't want in a public fork can live in
 `studio/`, a separate git repo nested here and ignored by this one. It uses
 the same layout (`studio/brands/<name>`, `studio/films/<slug>`), so imports
 work unchanged; `npm run new` puts a film next to its brand, and the root
@@ -124,5 +108,4 @@ echo '{ "extends": "../tsconfig.base.json" }' > studio/tsconfig.base.json
   3 people; larger teams need a [company licence](https://www.remotion.dev/license).
   Using this kit means using Remotion under its terms.
 - Geist and Geist Mono (in `brands/example/fonts`): SIL Open Font License 1.1, © Vercel.
-- `.claude/skills/motion-broll`: MIT, © 2026 Bart ([Barty-Bart/motion-graphics](https://github.com/Barty-Bart/motion-graphics)), copied unchanged; Lucide icons ISC. Licences and the upstream commit are in that folder.
 - `vendor/` kits keep their own licences; see `vendor/README.md`.

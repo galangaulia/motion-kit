@@ -1,11 +1,11 @@
 # Motion studio — house rules
 
-Two kinds of work, two skills:
+Films are made from nothing in code with Remotion, on shared packages. Read
+this before touching a film. The `/reel` skill (`.claude/skills/reel`) walks
+the whole workflow; these are the rules it enforces.
 
-- **Films** made from nothing in code with Remotion, on shared packages: the `/reel` skill (`.claude/skills/reel`) walks the whole workflow, and these are the rules it enforces.
-- **Edits**: motion-graphic B-roll for a talking-head video that already exists (reels, YouTube), timed to the transcript: the `/motion-broll` skill (`.claude/skills/motion-broll`, copied from Barty-Bart/motion-graphics, MIT). It has its own HTML engine and render pipeline; see *Edits* below.
-
-Read this before touching either.
+Motion-graphic B-roll for a talking-head video that already exists is a
+different job with its own engine: it lives in [broll-kit](https://github.com/galangaulia/broll-kit).
 
 ## Layout
 
@@ -14,11 +14,10 @@ Read this before touching either.
 - `packages/review` `motion-review`: contact sheet, 360 px phone sheet, sound report, scorecard
 - `brands/<name>` brand.json (voice, proof rules, CTA), synced tokens + fonts, `index.tsx` (fonts, logo, CSS with `--film-*` roles)
 - `films/<slug>` one Remotion project per film: brief, shotlist, review log, `src/timeline.ts`, `scripts/build-audio.mjs`
-- `edits/<slug>` one talking-head video per folder, used as `/motion-broll`'s `motion/` folder: `clips/*.html`, `plan.json`, `TIMING.md` are committed; `inputs/` (footage, transcript), `work/`, `dist/`, `out/` and its Playwright install are not
 - `templates/` the film starter + brief / shotlist / review log / style guide
 - `docs/` guides for users of the kit: `brand.md` (bring your own design system), `sound.md` (customize the soundtrack)
 - `vendor/` third-party kits, read-only, git-ignored. Check each one's licence before reusing anything (see `vendor/README.md`); a kit without a licence is reference only.
-- `studio/` optional private work (brands, films, edits) with the same layout, in its own git repo and ignored here. Never `git add -f` anything under it. Edits of a real person's footage belong here, not in the kit.
+- `studio/` optional private work (brands + films) with the same layout, in its own git repo and ignored here. Never `git add -f` anything under it.
 
 ## Determinism
 
@@ -74,13 +73,6 @@ computable on its own from `useCurrentFrame()`.
 3. Build against `timeline.ts`.
 4. Review loop: `npm run render && npm run review`, then look at `contact.png` and `phone.png`. Two critic subagents that have never seen the build (nor each other, nor earlier rounds) score the round in parallel, read-only, from the sheets, `report.md` and this file; the round's score per criterion is the lower of the two. A builder grading their own work came out about 2 points generous, and a single critic's 7-or-8 swings with who is judging. Fix the handful of issues that cost the most points (no more than three per round), log the round in `review_log.md`, and go again. **A film ships when every criterion scores 8 or more**, unless its owner calls it once the scores stop moving.
 5. Finals: every format and look the brief asks for, with motion blur (`npm run render:final` in the film → `out/final/`), then `npm run deliver -- <film>` from the repo root copies them to the brand's delivery folder (`brand.json` → `deliver.to`).
-
-## Edits
-
-- Follow `.claude/skills/motion-broll/SKILL.md`, with `edits/<slug>` (usually `studio/edits/<slug>`) as its `motion/` folder: `bash .claude/skills/motion-broll/scripts/setup.sh studio/edits/<slug>`. Put the source video and the SRT in `inputs/`.
-- Needs Python 3 + numpy and a full ffmpeg with `prores_ks` (Remotion's bundled ffmpeg lacks `overlay`, `fps` and `tmix`, so it won't do).
-- Look: the brand's tokens and faces (pass them in at the skill's interview), never the skill's default palette when a brand is given. *Picture* and *Brand truth* above apply: no invented numbers, results or quotes on screen.
-- Don't edit the skill's files in place: they are a plain copy of upstream (`UPSTREAM.md` says how to update). House-specific choices go in this file.
 
 ## Commands
 
