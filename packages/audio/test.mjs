@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { mkdtempSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { SR, TAU, buffer, integratedLufs, limit, mixdown, peakDb, pluck, readWav, writeWav } from './src/index.mjs'
+import { SR, TAU, buffer, integratedLufs, limit, mixdown, noise, peakDb, pluck, readWav, truePeakDb, writeWav } from './src/index.mjs'
 
 const close = (a, b, eps, msg) => assert.ok(Math.abs(a - b) <= eps, `${msg}: ${a} vs ${b}`)
 
@@ -15,6 +15,26 @@ for (const sr of [44100, 48000]) {
   const amp = 10 ** (-20 / 20) * Math.SQRT2
   const L = new Float32Array(n).map((_, i) => amp * Math.sin((TAU * 997 * i) / sr))
   close(integratedLufs([L, L.slice()], sr), -17, 0.3, `tone loudness @${sr}`)
+}
+
+// True peak. A sine at a quarter of the sample rate, sampled 45° off its crests,
+// never has a sample on a crest: samples read −9.03 dBFS, the wave itself −6.02.
+{
+  const x = new Float32Array(4800).map((_, i) => 0.5 * Math.sin((Math.PI / 2) * i + Math.PI / 4))
+  close(peakDb([x, x]), -9.03, 0.01, 'fs/4 sample peak')
+  close(truePeakDb([x, x]), -6.02, 0.15, 'fs/4 true peak')
+}
+// A slow wave has its crests on samples: true peak ≈ sample peak, at both rates.
+for (const sr of [44100, 48000]) {
+  const n = sr
+  const x = new Float32Array(n).map((_, i) => 0.5 * Math.sin((TAU * 997 * i) / sr) * Math.sin((Math.PI * i) / n))
+  close(truePeakDb([x, x]), peakDb([x, x]), 0.1, `997 Hz true peak @${sr}`)
+}
+{
+  const rnd = noise(5)
+  const x = new Float32Array(SR / 4).map(() => 0.4 * rnd())
+  assert.ok(truePeakDb([x, x]) >= peakDb([x, x]), 'true peak is never under the sample peak')
+  assert.equal(truePeakDb(buffer(0.1)), -Infinity, 'silence has no peak')
 }
 
 // Limiter: nothing above the ceiling, quiet material untouched.

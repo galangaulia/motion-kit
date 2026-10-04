@@ -80,6 +80,42 @@ export function peakDb([L, R], from = 0, to = L.length) {
   return max > 0 ? 20 * Math.log10(max) : -Infinity
 }
 
+// BS.1770-4 Annex 2: a 48-tap interpolating FIR for 4× oversampling, as four
+// 12-tap phases (phases 2 and 3 are phases 1 and 0 reversed).
+const PHASE0 = [
+  0.001708984375, 0.010986328125, -0.0196533203125, 0.033203125, -0.0594482421875, 0.1373291015625, 0.97216796875,
+  -0.102294921875, 0.047607421875, -0.026611328125, 0.014892578125, -0.00830078125,
+]
+const PHASE1 = [
+  -0.0291748046875, 0.029296875, -0.0517578125, 0.089111328125, -0.16650390625, 0.465087890625, 0.77978515625,
+  -0.2003173828125, 0.1015625, -0.0582275390625, 0.0330810546875, -0.0189208984375,
+]
+const PHASES = [PHASE0, PHASE1, PHASE1.toReversed(), PHASE0.toReversed()]
+
+/**
+ * True peak in dBTP: the highest point of the waveform between samples, found
+ * by 4× oversampling (BS.1770-4 Annex 2). A converter or an AAC encoder sees
+ * this, and it can sit above the sample peak. Only positions whose whole
+ * filter window lies inside the buffer are measured, so a buffer that stops
+ * mid-wave doesn't read high.
+ */
+export function truePeakDb([L, R]) {
+  const taps = PHASE0.length
+  let max = 0
+  for (const x of [L, R]) {
+    for (let i = 0; i < x.length; i++) max = Math.max(max, Math.abs(x[i]))
+    for (let n = taps - 1; n < x.length; n++) {
+      for (const h of PHASES) {
+        let y = 0
+        for (let j = 0; j < taps; j++) y += h[j] * x[n - j]
+        if (y > max) max = y
+        else if (-y > max) max = -y
+      }
+    }
+  }
+  return max > 0 ? 20 * Math.log10(max) : -Infinity
+}
+
 /** RMS over a sample range, in dBFS. */
 export function rmsDb([L, R], from = 0, to = L.length) {
   let sum = 0
