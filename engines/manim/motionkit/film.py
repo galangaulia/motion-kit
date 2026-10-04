@@ -64,9 +64,9 @@ class Film:
         self.start = job.get("start", 0)
         self.frames = job.get("frames", 0)
         self.frame_list = job.get("frame_list")
-        with open(job["timeline"]) as f:
+        with open(job["timeline"], encoding="utf-8") as f:
             self.timeline = _namespace(json.load(f))
-        with open(job["brand"]) as f:
+        with open(job["brand"], encoding="utf-8") as f:
             brand = json.load(f)
         self.name = brand.get("name") or ""
         self.colors = brand["colors"]

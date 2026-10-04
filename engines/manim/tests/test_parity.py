@@ -10,7 +10,7 @@ import unittest
 
 from motionkit import count_up, enter, exit, grid, hash, motion, peak_overshoot, scramble, spring_at, spring_velocity
 
-with open(os.path.join(os.path.dirname(__file__), "fixture.json")) as f:
+with open(os.path.join(os.path.dirname(__file__), "fixture.json"), encoding="utf-8") as f:
     FIX = json.load(f)
 
 TOL = 1e-9

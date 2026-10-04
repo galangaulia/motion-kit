@@ -70,6 +70,9 @@ npm test
 cd films/tally-demo && npm run studio   # the demo, live
 ```
 
+Step by step, from a clone or a ZIP download, per engine and per platform
+(macOS, Windows, Linux): [docs/setup.md](docs/setup.md).
+
 ## Make a film
 
 ```bash
@@ -87,6 +90,7 @@ and `scripts/build-audio.mjs` both read it, so a retimed shot keeps its sound.
 
 ## Guides
 
+- [Setup](docs/setup.md): from a clone or a ZIP to a rendered film, per engine and platform.
 - [Engines](docs/engines.md): Remotion, HyperFrames or Manim, which to pick and what each needs; Manim clips inside the others.
 - [Bring your own brand](docs/brand.md): the `--film-*` roles, fonts, tokens, logo, syncing from your product repo.
 - [Make the sound yours](docs/sound.md): how a film's soundtrack is built, the synth voices, your own samples or a licensed track.

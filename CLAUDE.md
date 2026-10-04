@@ -18,7 +18,7 @@ different job with its own engine: it lives in [broll-kit](https://github.com/ga
 - `films/<slug>` one project per film, on one engine (`package.json` → `motionKit`): brief, shotlist, review log, `src/timeline.ts`, `scripts/build-audio.mjs`
 - `templates/` brief / shotlist / review log / style guide, and `shared/` (the timeline and soundtrack script every engine's starter begins from)
 - `AGENTS.md`, `GEMINI.md`, `.agents/skills/` the way in for other agents (Codex, Gemini CLI, Cursor, Copilot). When a rule or the skill starts leaning on a Claude Code feature, say in `AGENTS.md` how to do it without one.
-- `docs/` guides for users of the kit: `engines.md` (which engine, and how to install it), `brand.md` (bring your own design system), `sound.md` (customize the soundtrack)
+- `docs/` guides for users of the kit: `setup.md` (from a clone or a ZIP, per platform), `engines.md` (which engine), `brand.md` (bring your own design system), `sound.md` (customize the soundtrack)
 - `vendor/` third-party kits, read-only, git-ignored. Check each one's licence before reusing anything (see `vendor/README.md`); a kit without a licence is reference only.
 - `studio/` optional private work (brands + films) with the same layout, in its own git repo and ignored here. Never `git add -f` anything under it.
 

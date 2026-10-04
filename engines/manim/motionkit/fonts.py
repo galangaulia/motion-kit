@@ -50,7 +50,7 @@ def convert(src: str, family: str, out: str) -> list[str]:
 def main() -> None:
     brand_path, out = sys.argv[1], sys.argv[2]
     os.makedirs(out, exist_ok=True)
-    with open(brand_path) as f:
+    with open(brand_path, encoding="utf-8") as f:
         brand = json.load(f)
     for face in brand["fontFiles"]:
         for path in convert(face["src"], face["family"], out):

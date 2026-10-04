@@ -33,6 +33,8 @@ How each engine meets the house rules: `engines/<engine>/BUILD.md`.
 
 ## Installing what each one needs
 
+Step by step, per platform: [setup.md](setup.md).
+
 **Remotion**: nothing beyond `npm install`. It downloads its own Chrome and
 ships its own ffmpeg.
 
@@ -41,12 +43,13 @@ The kit looks in `$MOTION_KIT_FFMPEG`, then `PATH`, then `~/.local/bin`:
 
 ```bash
 brew install ffmpeg            # macOS with Homebrew
+winget install Gyan.FFmpeg     # Windows
 sudo apt install ffmpeg        # Debian / Ubuntu
 # or a static build in ~/.local/bin (ffmpeg and ffprobe)
 ```
 
-The first render downloads the headless Chrome HyperFrames pins (about 95 MB,
-into `~/.cache/hyperframes`). Versions are pinned exactly in the root
+The first render downloads the headless Chrome HyperFrames pins (a 95 MB
+download, about 200 MB in `~/.cache/hyperframes`). Versions are pinned exactly in the root
 `package.json` (`overrides`); upgrade them together, then run
 `node engines/hyperframes/test/seek.mjs`.
 
@@ -55,11 +58,13 @@ from conda-forge into the engine's own environment. No Homebrew, no system
 Python, no LaTeX:
 
 ```bash
-curl -fsSL https://pixi.sh/install.sh | PIXI_NO_PATH_UPDATE=1 sh   # → ~/.pixi
+curl -fsSL https://pixi.sh/install.sh | PIXI_NO_PATH_UPDATE=1 sh   # macOS, Linux → ~/.pixi
+powershell -ExecutionPolicy ByPass -c "irm -useb https://pixi.sh/install.ps1 | iex"   # Windows
 ```
 
 The first Manim render installs the environment from `engines/manim/pixi.lock`
-(a few hundred MB, once). Films that don't use Manim never need pixi.
+(about 800 MB in `engines/manim/.pixi`, once). Films that don't use Manim
+never need pixi.
 
 ## Changing engines
 

@@ -33,7 +33,8 @@ export function pixi() {
 /** Run motionkit's Python in the engine's pixi environment. */
 function python(args, { job, capture = false } = {}) {
   const r = spawnSync(pixi(), ['run', '--manifest-path', MANIFEST, 'python', '-W', 'ignore', ...args], {
-    env: { ...process.env, PYTHONPATH: ENGINE, ...(job ? { MOTIONKIT_JOB: JSON.stringify(job) } : {}) },
+    // UTF-8 mode: on Windows Python would read the job's JSON files as cp1252.
+    env: { ...process.env, PYTHONPATH: ENGINE, PYTHONUTF8: '1', ...(job ? { MOTIONKIT_JOB: JSON.stringify(job) } : {}) },
     stdio: capture ? ['ignore', 'pipe', 'inherit'] : 'inherit',
     encoding: 'utf8',
   })
