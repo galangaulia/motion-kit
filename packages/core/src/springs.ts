@@ -74,6 +74,31 @@ export function springAt(seconds: number, preset?: Preset): number {
 }
 
 /**
+ * Speed of `springAt` (travel per second) `seconds` after release: 0 at
+ * release, highest early on, 0 again once it settles.
+ */
+export function springVelocity(seconds: number, preset?: Preset): number {
+  if (!(seconds > 0)) return 0
+  const { duration, bounce } = shapeOf(preset)
+  const w0 = (2 * Math.PI) / duration
+  const zeta = 1 - bounce
+  const t = seconds
+
+  if (zeta < 1) {
+    const decay = zeta * w0
+    const wd = w0 * Math.sqrt(1 - zeta * zeta)
+    return ((w0 * w0) / wd) * Math.exp(-decay * t) * Math.sin(wd * t)
+  }
+
+  if (zeta === 1) return w0 * w0 * t * Math.exp(-w0 * t)
+
+  const spread = w0 * Math.sqrt(zeta * zeta - 1)
+  const fast = -zeta * w0 - spread
+  const slow = -zeta * w0 + spread
+  return (slow * fast * (Math.exp(fast * t) - Math.exp(slow * t))) / (fast - slow)
+}
+
+/**
  * How far past the target a preset swings at its first peak, as a fraction of
  * the travel (0.05 = 5 %). Zero for presets that do not overshoot.
  */
@@ -90,6 +115,16 @@ const clamp01 = (x: number) => (x < 0 ? 0 : x > 1 ? 1 : x)
 /** Frame-based helpers bound to a frame rate. */
 export function motion(fps: number) {
   const progress = (frame: number, at: number, preset?: Preset) => springAt((frame - at) / fps, preset)
+  const track =(frame: number, keys: readonly TrackKey[], preset?: Preset) => {
+    if (keys.length === 0) return 0
+    let value = keys[0][1]
+    for (let i = 1; i < keys.length; i++) {
+      const [at, target, own] = keys[i]
+      if (at >= frame) continue
+      value += (target - keys[i - 1][1]) * progress(frame, at, own ?? preset)
+    }
+    return value
+  }
 
   return {
     fps,
@@ -106,16 +141,41 @@ export function motion(fps: number) {
      * each later key launches its own spring for the change it asks for, and
      * those springs add up, so a new target never cuts off one in flight.
      */
-    track: (frame: number, keys: readonly TrackKey[], preset?: Preset) => {
-      if (keys.length === 0) return 0
-      let value = keys[0][1]
+    track,
+
+    /** Speed of a `track()` at `frame`, in units per second. */
+    trackVelocity: (frame: number, keys: readonly TrackKey[], preset?: Preset) => {
+      let speed = 0
       for (let i = 1; i < keys.length; i++) {
         const [at, target, own] = keys[i]
         if (at >= frame) continue
-        value += (target - keys[i - 1][1]) * progress(frame, at, own ?? preset)
+        speed += (target - keys[i - 1][1]) * springVelocity((frame - at) / fps, own ?? preset)
       }
-      return value
+      return speed
     },
+
+    /**
+     * A spring let go on frame `at` at `from` while already moving at
+     * `velocity` (units per second), heading for `to`. For a drag that is
+     * released, or a shot that takes over a value at the speed it had in the
+     * one before (`trackVelocity()` on the cut frame). `from` until `at`.
+     */
+    release: (frame: number, at: number, from: number, velocity: number, to: number, preset?: Preset) => {
+      const t = (frame - at) / fps
+      if (!(t > 0)) return from
+      const w0 = (2 * Math.PI) / shapeOf(preset).duration
+      // A spring's speed after a unit step, over w0², is its motion after a unit kick.
+      return to + (from - to) * (1 - springAt(t, preset)) + (velocity * springVelocity(t, preset)) / (w0 * w0)
+    },
+
+    /**
+     * A scale (or any value > 0) moved in log space: each doubling takes the
+     * same time, so a deep zoom keeps one apparent speed instead of rushing at
+     * the start and crawling at the end. Keys as in `track()`. Also the camera
+     * push for an impact: [[0, 1], [hit, 1.06, 'snappy'], [hit + 8, 1]].
+     */
+    zoom: (frame: number, keys: readonly TrackKey[], preset?: Preset) =>
+      Math.exp(track(frame, keys.map(([at, value, own]) => [at, Math.log(value), own] as const), preset)),
 
     /**
      * Opacity for text inside a container that changes shape on frames `inAt`
