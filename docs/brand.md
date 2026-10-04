@@ -11,11 +11,12 @@ the brand and the same film renders in another design system. The kit ships two:
 
 ```text
 brands/<name>/
-  brand.json    voice, proof rules, CTA, colour roles, optional sync + deliver
+  brand.json    voice, proof rules, CTA, colour roles, CSS files and font files,
+                optional sync + deliver
   brand.css     the --film-* roles, pointed at your tokens
   tokens.css    your design tokens (optional: synced from your product repo)
   fonts/        the faces you use, plus their licence
-  index.tsx     what films import: `fonts`, `Logotype` (and optionally `LogoMark`)
+  index.tsx     what Remotion films import: `fonts`, `Logotype` (and optionally `LogoMark`)
 ```
 
 ### The roles every film reads
@@ -50,15 +51,40 @@ for more, and one display face plus one UI face.
 
 `brands/example/index.tsx` is a complete, small example.
 
+### For HyperFrames and Manim films
+
+Those engines don't import `index.tsx`; they read the same files through
+`brand.json`:
+
+```json
+"css": ["tokens.css", "brand.css"],
+"fontFiles": [
+  { "family": "Acme Sans", "src": "fonts/AcmeSans-Variable.woff2", "weight": "100 900" }
+]
+```
+
+- `css` — the brand's CSS files in the order a page loads them (an `@import`
+  inside one is followed). Default: `["brand.css"]`.
+- `fontFiles` — every face, with the family name the `--film-font-*` roles use.
+  HyperFrames turns them into `@font-face` rules; Manim converts them to TTF.
+- HyperFrames films get the logo by rendering your `Logotype` once to static
+  HTML, so it stays the one you wrote in `index.tsx`.
+- Manim can't read CSS, so the `--film-*` colour roles are resolved to hex
+  from the top-level `:root` blocks (a dark-scheme `@media` block is skipped).
+  Every role has to end in a hex or `rgb()` value; `logo` in `brand.json` may
+  point at an SVG of the logotype (text converted to outlines).
+
 ## Make yours
 
 1. **Copy the blank:** `cp -R brands/_blank brands/acme`.
 2. **Fonts:** put the `.woff2` files and their licence in `fonts/`, import them in
-   `index.tsx`, list them in `fonts`, and name them in the `--film-font-*` roles.
+   `index.tsx`, list them in `fonts` and in `brand.json` → `fontFiles`, and name
+   them in the `--film-font-*` roles.
    Only ship faces whose licence allows embedding in video (OFL, or a licence you
    hold).
 3. **Tokens**, either way:
-   - paste them into `tokens.css` and import it at the top of `index.tsx`, or
+   - paste them into `tokens.css`, import it at the top of `index.tsx` and list
+     it first in `brand.json` → `css`, or
    - keep them in sync with your product: fill `sync` in `brand.json` (`root` is
      your product repo, `files` maps source → destination) and run
      `npm run brand:sync -- acme`. The copies are committed, so a design change in

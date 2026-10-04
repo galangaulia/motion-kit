@@ -1,0 +1,23 @@
+{
+  "name": "@motion-kit/hyperframes",
+  "private": true,
+  "description": "HyperFrames as a motion-kit engine: a film is HTML + CSS + one render(frame) function, built into pages per format, rendered by headless Chrome, reviewed from its render.",
+  "type": "module",
+  "bin": {
+    "motion-hf": "./bin/motion-hf.mjs"
+  },
+  "exports": {
+    "./runtime": "./src/runtime.ts",
+    "./review": "./review.mjs"
+  },
+  "dependencies": {
+    "@hyperframes/producer": "0.8.121",
+    "@motion-kit/media": "*",
+    "@motion-kit/review": "*",
+    "@puppeteer/browsers": "^3.2.2",
+    "esbuild": "^0.25.12",
+    "hyperframes": "0.8.121",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  }
+}

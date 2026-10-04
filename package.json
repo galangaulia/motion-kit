@@ -11,11 +11,19 @@
   ],
   "scripts": {
     "brand:sync": "node scripts/brand-sync.mjs",
-    "test": "node packages/core/test.mjs && node packages/audio/test.mjs && node packages/media/test.mjs && node packages/review/test.mjs",
+    "test": "node packages/core/test.mjs && node packages/audio/test.mjs && node packages/media/test.mjs && node packages/review/test.mjs && node scripts/brand-export.test.mjs",
     "new": "node scripts/new-film.mjs",
     "deliver": "node scripts/deliver.mjs"
   },
   "engines": {
     "node": ">=22.18"
+  },
+  "overrides": {
+    "@hyperframes/core": "0.8.121",
+    "@hyperframes/engine": "0.8.121",
+    "@hyperframes/lint": "0.8.121",
+    "@hyperframes/parsers": "0.8.121",
+    "@hyperframes/producer": "0.8.121",
+    "@hyperframes/studio-server": "0.8.121"
   }
 }

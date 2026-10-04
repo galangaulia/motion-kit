@@ -1,0 +1,85 @@
+/* Film styles. Colours and faces come only from the brand's --film-* roles
+   (brands/<brand>/brand.css). Sizes are written for the 540 square and scale
+   with --u, which film.ts sets from the format's size. No transition, animation
+   or @keyframes: film.ts sets every moving value from the frame number. */
+
+.film-stage {
+  background: var(--film-bg);
+  color: var(--film-ink);
+  font-family: var(--film-font-ui);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* A layer that fills the frame, like Remotion's AbsoluteFill. */
+.fill {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.film-center {
+  align-items: center;
+  justify-content: center;
+}
+
+.film-hook {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0 calc(14px * var(--u));
+  max-width: 90%;
+  font-family: var(--film-font-display);
+  font-size: calc(56px * var(--u));
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+}
+
+.film-hook-word {
+  display: inline-block;
+}
+
+.film-box {
+  position: relative;
+  overflow: hidden;
+  background: var(--film-card);
+  border: 1px solid var(--film-line);
+}
+
+.film-rows {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: calc(18px * var(--u));
+  padding: 0 calc(32px * var(--u));
+}
+
+.film-row {
+  display: flex;
+  align-items: center;
+  gap: calc(14px * var(--u));
+  font-size: calc(26px * var(--u));
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.film-row-dot {
+  flex-shrink: 0;
+  width: calc(16px * var(--u));
+  height: calc(16px * var(--u));
+  border-radius: 50%;
+  background: var(--film-accent);
+}
+
+.film-cta {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: calc(28px * var(--u));
+  font-weight: 700;
+  color: var(--film-on-accent);
+}

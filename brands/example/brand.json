@@ -20,6 +20,21 @@
     "ui": "Geist",
     "mono": "Geist Mono"
   },
+  "css": [
+    "brand.css"
+  ],
+  "fontFiles": [
+    {
+      "family": "Geist",
+      "src": "fonts/Geist-Variable.woff2",
+      "weight": "100 900"
+    },
+    {
+      "family": "Geist Mono",
+      "src": "fonts/GeistMono-Variable.woff2",
+      "weight": "100 900"
+    }
+  ],
   "deliver": {
     "to": "~/Videos/Tally",
     "note": "Finished films are copied here by `npm run deliver -- <film>` (one folder per film)."

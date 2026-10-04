@@ -15,6 +15,13 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+# HyperFrames' producer depends on Puppeteer, whose install would download a
+# Chrome nobody uses: Remotion fetches its own, motion-hf the one HyperFrames pins.
+env:
+  PUPPETEER_SKIP_DOWNLOAD: '1'
+  HYPERFRAMES_NO_TELEMETRY: '1'
+  HYPERFRAMES_NO_UPDATE_CHECK: '1'
+
 jobs:
   check:
     name: tests, types, scaffold (Node ${{ matrix.node }})
@@ -61,5 +68,37 @@ jobs:
           for f in contact.png phone.png report.md; do test -s "$dir$f" || { echo "missing $dir$f"; exit 1; }; done
           grep -q '^| Glitches' "${dir}report.md" || { echo "no motion checks in ${dir}report.md"; exit 1; }
           stills=$(ls -d films/tally-demo/out/review/*-Square-stills/ | head -1)
+          for f in stills.png phone.png report.md; do test -s "$stills$f" || { echo "missing $stills$f"; exit 1; }; done
+          echo "ok: $dir $stills"
+
+  hyperframes:
+    name: HyperFrames engine (seek conformance, render + review)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      # HyperFrames needs a full ffmpeg; Remotion's own build is too small for it.
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ffmpeg
+      - run: npm install --no-audit --no-fund
+      - run: npx motion-hf browser
+      # Every frame drawn from its own frame number, with 1 and 4 workers, same pixels.
+      - run: node engines/hyperframes/test/seek.mjs
+      - name: Scaffold, render and review a HyperFrames film
+        run: |
+          npm run new -- ci-hf --brand example --engine hyperframes
+          npm run typecheck -w @films/ci-hf
+          npm run render -w @films/ci-hf
+          npm run review -w @films/ci-hf -- --strict
+          npm run stills -w @films/ci-hf
+      - name: Check the review and the stills produced their sheets
+        run: |
+          dir=$(ls -d films/ci-hf/out/review/*-Square/ | head -1)
+          for f in contact.png phone.png report.md; do test -s "$dir$f" || { echo "missing $dir$f"; exit 1; }; done
+          grep -q '^| Glitches' "${dir}report.md" || { echo "no motion checks in ${dir}report.md"; exit 1; }
+          stills=$(ls -d films/ci-hf/out/review/*-Square-stills/ | head -1)
           for f in stills.png phone.png report.md; do test -s "$stills$f" || { echo "missing $stills$f"; exit 1; }; done
           echo "ok: $dir $stills"
