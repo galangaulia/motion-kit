@@ -1,6 +1,6 @@
 // Sanity checks for the pure-math parts of @motion-kit/core. Run: npm test
 import assert from 'node:assert/strict'
-import { PRESETS, motion, peakOvershoot, springAt } from './src/springs.ts'
+import { PRESETS, motion, peakOvershoot, springAt, springVelocity } from './src/springs.ts'
 import { grid } from './src/beats.ts'
 import { countUp, hash, scramble } from './src/text.ts'
 
@@ -47,6 +47,49 @@ const a = m.track(16, path)
 const b = m.track(17, path)
 assert.ok(Math.abs(b - a) < 20, `no jump on retarget (${a} -> ${b})`)
 near(m.track(300, path), 40, 1e-6, 'track ends on the last target')
+
+// springVelocity(): the slope of springAt, for every kind of damping.
+for (const preset of [...Object.keys(PRESETS), slow]) {
+  assert.equal(springVelocity(0, preset), 0, 'still at release')
+  assert.equal(springVelocity(-1, preset), 0, 'still before release')
+  for (const t of [0.02, 0.1, 0.25, 0.6]) {
+    const dt = 1e-5
+    const slope = (springAt(t + dt, preset) - springAt(t - dt, preset)) / (2 * dt)
+    near(springVelocity(t, preset), slope, 1e-4 * Math.max(1, Math.abs(slope)), `velocity is the slope at ${t}s`)
+  }
+}
+
+// trackVelocity(): the slope of track(), in units per second.
+for (const f of [12, 16.5, 20, 40]) {
+  const slope = (m.track(f + 1e-4, path) - m.track(f - 1e-4, path)) / (2e-4 / 30)
+  near(m.trackVelocity(f, path), slope, 1e-3 * Math.max(1, Math.abs(slope)), `track speed at f${f}`)
+}
+assert.equal(m.trackVelocity(5, path), 0, 'no speed before the first retarget')
+
+// release(): starts where and as fast as it was let go, lands on its target.
+{
+  const fine = motion(1000)
+  for (const preset of [...Object.keys(PRESETS), slow]) {
+    assert.equal(fine.release(100, 100, 30, 500, 80, preset), 30, 'starts at from')
+    const speed = (fine.release(100.01, 100, 30, 500, 80, preset) - 30) / (0.01 / 1000)
+    near(speed, 500, 5, `starts at the speed it was let go (${preset})`)
+    near(fine.release(5000, 100, 30, 500, 80, preset), 80, 1e-6, 'lands on to')
+  }
+  for (const f of [10, 14, 20, 40]) near(m.release(f, 10, 0, 0, 100), m.spring(f, 10, 0, 100), 1e-9, 'from rest it is spring()')
+  // Thrown the wrong way it travels backwards first; thrown along, it gets there sooner.
+  assert.ok(m.release(11, 10, 0, -600, 100) < 0, 'a backward throw dips first')
+  assert.ok(m.release(13, 10, 0, 600, 100) > m.spring(13, 10, 0, 100), 'a forward throw is ahead of a spring from rest')
+}
+
+// zoom(): log space, so halfway through the spring a 1 → 4 zoom reads 2.
+{
+  const keys = [[0, 1], [10, 4]]
+  for (const f of [11, 14, 18, 30]) near(m.zoom(f, keys), 4 ** m.progress(f, 10), 1e-9, `zoom at f${f}`)
+  let f = 10
+  while (m.progress(f, 10) < 0.5) f += 0.01
+  near(m.zoom(f, keys), 2, 0.01, 'halfway is the geometric middle')
+  near(m.zoom(300, [[0, 1], [10, 1.06, 'snappy'], [18, 1]]), 1, 1e-6, 'a punch-in comes back to 1')
+}
 
 // swapAlpha(): hidden, then shown, then hidden again before the next morph.
 assert.equal(m.swapAlpha(0, 10, 60), 0)

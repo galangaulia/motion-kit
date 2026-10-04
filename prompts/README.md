@@ -17,9 +17,10 @@ tokens. Nothing from the reference's copy, colours or faces carries over. No cod
 
 ## Critique round
 ```text
-Render and review, then hand contact.png, phone.png and report.md to a fresh critic subagent.
-Log its scores in review_log.md, citing frames. Fix what cost the most points (three things at
-most), and go round again until nothing scores under 8.
+Render and review, then hand contact.png, phone.png, report.md and flags.png to two fresh
+critic subagents. Log both sets of scores in review_log.md, citing frames; the lower one counts.
+Fix the P0s and what cost the most points (three things at most), and go round again until
+nothing scores under 8.
 ```
 
 ## Retime to the beat

@@ -13,7 +13,7 @@ Start here.
 
 ## Where the rules assume Claude Code
 
-- **The `/reel` skill** lives in `.claude/skills/reel/SKILL.md` and is linked at `.agents/skills/reel` for tools that load skills from there (Codex, Gemini CLI). If yours doesn't, read that file when asked for a video, reel, teaser or promo and follow its steps in order, the stop for shotlist approval included.
+- **The `/reel` skill** lives in `.claude/skills/reel/SKILL.md` and is linked at `.agents/skills/reel` for tools that load skills from there (Codex, Gemini CLI). If yours doesn't, read that file when asked for a video, reel, teaser or promo and follow its steps in order, the stops for shotlist and key-stills approval included.
 - **AskUserQuestion** (the intake): ask the same questions in one message and wait for the answers.
 - **Built-in browser screenshots** (capturing the real product): use Playwright, or ask the user for screenshots.
 - **Critic subagents** (gate 4, the skill's review loop): the two critics must never have seen the build, each other or earlier rounds. If your tool can start a fresh sub-agent with none of this session's context, start two. If it can't, don't score the round yourself (self-scores ran about 2 points high): give the user the prompt below with the paths filled in, ask them to run it in two new sessions, and log what comes back. A critic on a different model from the builder is welcome.
@@ -22,9 +22,11 @@ Start here.
 You're judging a short motion-graphics film you haven't seen being made.
 Read CLAUDE.md in <repo path> for the house rules, then look at
 <review folder>/contact.png (rhythm, variety, composition),
-<review folder>/phone.png (360 px wide: can every word be read?) and
-<review folder>/report.md (sound report and scorecard).
+<review folder>/phone.png (360 px wide: can every word be read?),
+<review folder>/report.md (motion checks, sound report and scorecard) and,
+if it exists, <review folder>/flags.png (each flagged moment up close).
 The film's point: "<one-liner from brief.md>".
 Score each of the seven scorecard rows from 1 to 10, citing frame numbers,
+mark each issue P0 (breaks a house rule or can't be read), P1 or P2,
 then name the three issues that cost the most points. Read only: don't edit anything.
 ```

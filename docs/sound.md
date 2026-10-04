@@ -70,6 +70,9 @@ in `brands/<name>/sound.mjs` (for example `export const whoosh = …`,
 ## Check it
 
 `npm run audio` prints loudness and peak. `npm run review` adds a sound table
-to `report.md`: every cue should rise about **+4 dB or more** above the bed just
-before it. A cue under that won't be heard; raise its gain, shorten the sound
-before it, or drop it. The film must also work muted: every message on screen.
+to `report.md`, measured on the rendered MP4 after its AAC encode: loudness,
+sample peak and **true peak** (the wave between samples, which the encode can
+push up; keep it at −1 dBTP or below). Every cue should rise about **+4 dB or
+more** above the bed just before it. A cue under that won't be heard; raise its
+gain, shorten the sound before it, or drop it. The film must also work muted:
+every message on screen.

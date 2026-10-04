@@ -22,3 +22,14 @@ export const HOOK_WORDS = ['Your', 'hook,', 'five', 'words.']
 
 /** Beats on which a row lands inside the product card. */
 export const ROWS_AT = [5, 6, 7]
+
+/**
+ * Key stills (gate 2b): one frame per shot, at the moment it makes its point.
+ * Their look is approved before the rest of the film is animated; render them
+ * with `npm run stills`.
+ */
+export const STILLS = [
+  { frame: g.hit(HOOK.to) - 1, label: 'hook' },
+  { frame: g.beat(PRODUCT.to - 4), label: 'product' },
+  { frame: TOTAL_FRAMES - 1, label: 'end card' },
+]

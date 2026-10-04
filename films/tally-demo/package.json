@@ -9,6 +9,7 @@
     "render:all": "npm run audio && remotion render Square out/square.mp4 && remotion render Vertical out/vertical.mp4 && remotion render Wide out/wide.mp4",
     "render:final": "npm run audio && remotion render Square-Final out/final/tally-demo-1x1.mp4 && remotion render Vertical-Final out/final/tally-demo-9x16.mp4 && remotion render Wide-Final out/final/tally-demo-16x9.mp4",
     "review": "motion-review --comp Square --video out/square.mp4",
+    "stills": "motion-review --comp Square --stills",
     "typecheck": "tsc -p ."
   },
   "dependencies": {

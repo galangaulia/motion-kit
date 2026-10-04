@@ -1,5 +1,6 @@
 // Showreel effects: deterministic, frame-driven, safe to render in any order.
 
+import { motion, type Preset, type TrackKey } from './springs'
 import { hash } from './text'
 
 /**
@@ -126,5 +127,56 @@ export function Streaks({ frame, width, height, color, opacity, cx, cy, count = 
     <svg width={width} height={height} style={{ position: 'absolute', inset: 0, opacity, pointerEvents: 'none' }} aria-hidden>
       {lines}
     </svg>
+  )
+}
+
+// ── Transitions ────────────────────────────────────────────────────────
+
+/**
+ * A colour that floods the frame from a point: a circle on a spring, released
+ * on frame `at`, whose radius ends past the farthest corner, so the whole frame
+ * turns in one move (about 0.3 s on `default`) instead of a dissolve. With
+ * `out`, it drains into `outTo` (default: where it came from) and uncovers what
+ * is underneath. Put the next shot under it, or let the colour be its ground.
+ */
+export function Flood({
+  frame,
+  fps,
+  at,
+  width,
+  height,
+  color,
+  cx,
+  cy,
+  out,
+  outTo = { x: cx, y: cy },
+  preset,
+}: {
+  frame: number
+  fps: number
+  at: number
+  width: number
+  height: number
+  color: string
+  cx: number
+  cy: number
+  out?: number
+  outTo?: { x: number; y: number }
+  preset?: Preset
+}) {
+  const m = motion(fps)
+  // Past the corner, so the spring's last few percent happen off screen.
+  const reach = 1.08 * Math.hypot(Math.max(cx, width - cx), Math.max(cy, height - cy))
+  const radius: TrackKey[] = [[0, 0], [at, reach]]
+  if (out !== undefined) radius.push([out, 0])
+  const r = m.track(frame, radius, preset)
+  if (r <= 0.5) return null
+  const x = out === undefined ? cx : m.track(frame, [[0, cx], [out, outTo.x]], preset)
+  const y = out === undefined ? cy : m.track(frame, [[0, cy], [out, outTo.y]], preset)
+  return (
+    <div
+      style={{ position: 'absolute', inset: 0, background: color, clipPath: `circle(${r}px at ${x}px ${y}px)`, pointerEvents: 'none' }}
+      aria-hidden
+    />
   )
 }
