@@ -1,0 +1,13 @@
+{
+  "name": "@motion-kit/remotion",
+  "private": true,
+  "description": "Remotion as a motion-kit engine: the film template (template/) and the review's stills — bundle once, render any frame at any scale.",
+  "type": "module",
+  "exports": {
+    "./review": "./review.mjs"
+  },
+  "dependencies": {
+    "@remotion/bundler": "4.0.532",
+    "@remotion/renderer": "4.0.532"
+  }
+}

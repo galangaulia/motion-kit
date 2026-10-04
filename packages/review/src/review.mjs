@@ -23,18 +23,22 @@
 // in src/timeline.ts's STILLS (or --frames) into out/review/<stamp>-<comp>-stills/:
 // stills/fNNNN.png at full size, stills.png side by side, phone.png at 360 px, and
 // a short report to approve the look before the rest of the film is animated.
+//
+// Any engine: the film's package.json names it ("motionKit": { "engine" }, Remotion
+// when absent) and @motion-kit/<engine>/review supplies the frames. Remotion renders
+// them from source (--comp is a composition id); HyperFrames and Manim films are
+// read from their render (--comp is a format in src/formats.ts, --video is needed
+// for the sheets) and render key stills themselves.
 
-import { spawnSync } from 'node:child_process'
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs'
+import { createRequire } from 'node:module'
 import { tmpdir } from 'node:os'
 import { pathToFileURL } from 'node:url'
 import { join, resolve } from 'node:path'
 import { parseArgs } from 'node:util'
 import { integratedLufs, peakDb, readWav, truePeakDb } from '@motion-kit/audio'
-import { bundle } from '@remotion/bundler'
-import { openBrowser, renderStill, selectComposition } from '@remotion/renderer'
+import { checkSize, decodeFrames, extractAudio, probe } from '@motion-kit/media'
 import sharp from 'sharp'
-import { checkSize, decodeFrames, probe } from './decode.mjs'
 import { flaggedFrames, flashFailed, motionChecks, motionReport } from './motion-checks.mjs'
 import { isStoryFormat, safeOutlineSvg } from './safe-zones.mjs'
 
@@ -72,16 +76,6 @@ mkdirSync(OUT, { recursive: true })
 const tmp = mkdtempSync(join(tmpdir(), 'motion-review-'))
 process.on('exit', () => rmSync(tmp, { recursive: true, force: true }))
 
-console.log('bundling…')
-// A film that customises webpack (e.g. to render a product's own components)
-// keeps the override in webpack-override.mjs next to its package.json; the
-// CLI picks it up from remotion.config.ts, the review has to load it itself.
-const overridePath = resolve('webpack-override.mjs')
-const webpackOverride = existsSync(overridePath) ? (await import(pathToFileURL(overridePath).href)).default : undefined
-const serveUrl = await bundle({ entryPoint: resolve(args.entry), outDir: join(tmp, 'bundle'), ...(webpackOverride ? { webpackOverride } : {}) })
-const composition = await selectComposition({ serveUrl, id: args.comp })
-const { fps, width, height, durationInFrames: total } = composition
-const safe = args.safe ?? isStoryFormat(width, height)
 const hasVideo = Boolean(args.video && existsSync(args.video))
 
 // The film's beat grid, from the src/timeline.ts the picture and the soundtrack
@@ -103,6 +97,29 @@ if (existsSync(resolve('src', 'timeline.ts'))) {
     beatNote = `_src/timeline.ts didn't load in Node (${e.message.split('\n')[0]}), so cuts are not checked against beats. ${TIMELINE_RULES}_`
   }
 }
+
+// The engine that made the film (package.json → "motionKit": { "engine" }; films
+// from before engines say nothing and are Remotion) supplies its size, rate and
+// length, and renders or cuts out any frame: @motion-kit/<engine>/review.
+const pkg = existsSync('package.json') ? JSON.parse(readFileSync('package.json', 'utf8')) : {}
+const engine = pkg.motionKit?.engine ?? 'remotion'
+let enginePath
+try {
+  enginePath = createRequire(resolve('package.json')).resolve(`@motion-kit/${engine}/review`)
+} catch {
+  console.error(`No review support for engine "${engine}": @motion-kit/${engine}/review didn't resolve (run npm install at the repo root).`)
+  process.exit(1)
+}
+const adapter = await (await import(pathToFileURL(enginePath).href)).open({
+  comp: args.comp,
+  entry: args.entry,
+  video: hasVideo ? args.video : undefined,
+  stills: args.stills,
+  timeline,
+  tmp,
+})
+const { fps, width, height, durationInFrames: total } = adapter.meta
+const safe = args.safe ?? isStoryFormat(width, height)
 
 // Key stills: --frames, or STILLS in timeline.ts (frame numbers, or { frame, label }).
 let stills = []
@@ -130,12 +147,12 @@ const sample = (step) => {
   return frames
 }
 
-const browser = await openBrowser('chrome')
-
+/** Frame `frame` at `scale` × the composition size; engines that hand back another size are resized. */
 async function still(frame, scale) {
-  const output = join(tmp, `${frame}-${scale.toFixed(3)}.png`)
-  await renderStill({ composition, serveUrl, frame, scale, output, imageFormat: 'png', puppeteerInstance: browser })
-  return readFileSync(output)
+  const png = await adapter.still(frame, scale)
+  const w = Math.round(width * scale)
+  const { width: got } = await sharp(png).metadata()
+  return got === w ? png : sharp(png).resize(w, Math.round(height * scale), { kernel: 'lanczos3' }).png().toBuffer()
 }
 
 const escapeXml = (text) => String(text).replace(/[<>&"]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' })[c])
@@ -176,6 +193,7 @@ if (args.stills) {
   // Full size is what the finals render at: 1080 on the short side.
   mkdirSync(join(OUT, 'stills'), { recursive: true })
   const full = 1080 / Math.min(width, height)
+  await adapter.prepare?.(stills.map((s) => s.frame))
   for (const { frame } of stills) {
     process.stdout.write(`\rstills: frame ${frame}   `)
     writeFileSync(join(OUT, 'stills', `f${String(frame).padStart(4, '0')}.png`), await still(frame, full))
@@ -185,7 +203,7 @@ if (args.stills) {
   const names = new Map(stills.map((s) => [s.frame, s.label]))
   await sheet(frames, 540 / Math.min(width, height), 2, 'stills.png', { names })
   await sheet(frames, 360 / width, 4, 'phone.png', { names, overlay: safe ? safeOutlineSvg : undefined })
-  await browser.close({ silent: true })
+  await adapter.close()
 
   writeFileSync(
     join(OUT, 'report.md'),
@@ -220,7 +238,7 @@ ${stills.map((s) => `| ${s.label} | ${s.frame} | ${(s.frame / fps).toFixed(2)} s
 
 await sheet(sample(every), 270 / width, 6, 'contact.png')
 await sheet(sample(phoneEvery), 360 / width, 4, 'phone.png', { overlay: safe ? safeOutlineSvg : undefined })
-await browser.close({ silent: true })
+await adapter.close()
 
 // ── Sound ─────────────────────────────────────────────────────────────
 
@@ -228,10 +246,9 @@ let audio = '_No video given (`--video`), so no sound check._'
 let truePeak = null
 if (hasVideo) {
   const wav = join(tmp, 'mix.wav')
-  const ff = spawnSync('npx', ['remotion', 'ffmpeg', '-y', '-loglevel', 'error', '-i', args.video, '-vn', '-ac', '2', '-ar', '48000', wav], {
-    stdio: 'inherit',
-  })
-  if (ff.status === 0) {
+  if (!extractAudio(args.video, wav, 48000)) {
+    audio = `_\`${args.video}\` has no sound track, so no sound check._`
+  } else {
     const sr = 48000
     const mix = readWav(wav, sr)
     const spf = sr / fps
@@ -291,8 +308,9 @@ if (hasVideo) {
     warnings.push(`⚠ \`${args.video}\` has ${video.frames} frames, ${args.comp} has ${total}: render again.`)
   }
   // public/audio is rebuilt by every `npm run audio`; its sources are in scripts/.
-  if (newest(['src', 'scripts', 'public'], join('public', 'audio')) > statSync(args.video).mtimeMs) {
-    warnings.push(`⚠ Files in src/, scripts/ or public/ changed after \`${args.video}\` was rendered: these checks and the sound describe an older cut.`)
+  // manim/ holds the scenes of a film's Manim clips (public/clips is built from them).
+  if (newest(['src', 'scripts', 'public', 'manim'], join('public', 'audio')) > statSync(args.video).mtimeMs) {
+    warnings.push(`⚠ Files in src/, scripts/, public/ or manim/ changed after \`${args.video}\` was rendered: these checks and the sound describe an older cut.`)
   }
 
   const size = checkSize(video.width, video.height)
@@ -338,7 +356,7 @@ writeFileSync(
   join(OUT, 'report.md'),
   `# Review ${stamp} · ${args.comp}
 
-${composition.width}×${composition.height} @ ${fps} fps · ${(total / fps).toFixed(1)} s
+${width}×${height} @ ${fps} fps · ${(total / fps).toFixed(1)} s
 
 Look at \`contact.png\` (rhythm, variety, composition) and \`phone.png\` (360 px:
 can every word be read?) before scoring.${

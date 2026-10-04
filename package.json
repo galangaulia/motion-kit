@@ -1,16 +1,17 @@
 {
   "name": "motion-kit",
   "private": true,
-  "description": "Motion studio: films made in code with Remotion, on shared springs, beat grid, synthesized sound and a critique loop.",
+  "description": "Motion studio: films made in code with Remotion, HyperFrames or Manim, on shared springs, beat grid, synthesized sound and a critique loop.",
   "type": "module",
   "workspaces": [
     "packages/*",
+    "engines/*",
     "films/*",
     "studio/films/*"
   ],
   "scripts": {
     "brand:sync": "node scripts/brand-sync.mjs",
-    "test": "node packages/core/test.mjs && node packages/audio/test.mjs && node packages/review/test.mjs",
+    "test": "node packages/core/test.mjs && node packages/audio/test.mjs && node packages/media/test.mjs && node packages/review/test.mjs",
     "new": "node scripts/new-film.mjs",
     "deliver": "node scripts/deliver.mjs"
   },

@@ -9,6 +9,14 @@ films/*/out/
 # which is committed (see docs/sound.md).
 films/*/public/audio/
 
+# Engine build output (HyperFrames pages, Manim frames, the exported brand and
+# timeline): rebuilt by every render.
+films/*/build/
+
+# Manim: Python caches and the pixi environment (pixi.lock is committed).
+__pycache__/
+engines/manim/.pixi/
+
 # Third-party kits are read-only references, fetched by hand (see vendor/README.md).
 vendor/*
 !vendor/README.md

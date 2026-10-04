@@ -2,7 +2,7 @@
 // (review.mjs itself runs on import, so only its pure modules are loaded here.)
 import assert from 'node:assert/strict'
 import { grid } from '../core/src/beats.ts'
-import { checkSize } from './src/decode.mjs'
+import { checkSize } from '@motion-kit/media'
 import { flaggedFrames, flashFailed, motionChecks, motionReport, onBeat } from './src/motion-checks.mjs'
 import { isStoryFormat, safeOutline, safeOutlineSvg } from './src/safe-zones.mjs'
 

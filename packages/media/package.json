@@ -1,0 +1,9 @@
+{
+  "name": "@motion-kit/media",
+  "private": true,
+  "description": "ffmpeg for every engine: finds a binary, knows what it can do, and probes, decodes, grabs stills, extracts audio, muxes the soundtrack and encodes.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.mjs"
+  }
+}
