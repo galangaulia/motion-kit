@@ -6,7 +6,7 @@ import { mkdirSync, rmSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { buffer, finish, hiss, lowpass, midi, mixdown, pad, pluck, reverb, sweep, thump, writeWav } from '@motion-kit/audio'
-import { BARS, CHECKS_AT, CTA, FPS, HOOK, HOOK_WORDS, PRESS_AT, PRODUCT, ROWS_AT, TOTAL_FRAMES, URL_AT, g } from '../src/timeline.ts'
+import { BARS, CHECKS_AT, CTA, FPS, HOOK, HOOK_OUT, HOOK_WORDS, PRESS_AT, PRODUCT, ROWS_AT, TOTAL_FRAMES, URL_AT, g } from '../src/timeline.ts'
 
 const OUT = join(dirname(fileURLToPath(import.meta.url)), '..', 'public', 'audio')
 
@@ -55,7 +55,8 @@ const whoosh = (() => {
 // Cue frames come from the same beats the picture uses.
 const cues = [
   ...HOOK_WORDS.map((_, i) => ({ name: `word-${i + 1}`, frame: g.beat(HOOK.from + i), buf: note([72, 74, 76, 79][i] ?? 79), gain: 0.5 })),
-  { name: 'whoosh', frame: g.beat(PRODUCT.from) - 6, buf: whoosh, gain: 0.45 },
+  { name: 'whoosh', frame: g.beat(PRODUCT.from) - 6, buf: whoosh, gain: 0.6 },
+  { name: 'lift', frame: g.beat(HOOK_OUT) - 4, buf: whoosh, gain: 1.1 },
   ...ROWS_AT.map((b, i) => ({ name: `row-${i + 1}`, frame: g.beat(b), buf: note(76 + i * 3, { ratio: 3 }), gain: 0.45 })),
   ...CHECKS_AT.map((b, i) => ({ name: `check-${i + 1}`, frame: g.beat(b), buf: note(84 + i * 2, { decay: 0.22, index: 1.3 }), gain: 0.5 })),
   { name: 'whoosh', frame: g.beat(CTA.from) - 6, buf: whoosh, gain: 0.45 },

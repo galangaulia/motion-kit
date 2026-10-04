@@ -23,8 +23,8 @@ None: the starter's grammar (one container that morphs from card to CTA).
 ## Arc
 | Beats | Job | What the viewer sees |
 |---|---|---|
-| 0–4 | Stop the scroll | "Streaks, not spreadsheets." one word per beat |
-| 4–12 | Meet the product, watch it work | Today's three habits land, then each is tapped to a check: one tap a day |
+| 0–3 | Stop the scroll | "Streaks, not spreadsheets." one word per beat |
+| 3–12 | Meet the product, watch it work | The first habit shows by 2 s under the hook; then all three, and a thumb taps each to a check: one tap a day |
 | 12–16 | Know where to go | The card becomes the "Try Tally" pill; logo and example.com land |
 
 No proof row: Tally is fictional and has no numbers to show.

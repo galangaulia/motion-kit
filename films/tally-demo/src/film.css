@@ -75,8 +75,8 @@
 .film-check {
   flex-shrink: 0;
   overflow: visible;
-  width: 1.08em;
-  height: 1.08em;
+  width: 1.2em;
+  height: 1.2em;
 }
 
 .film-cta {
@@ -88,6 +88,15 @@
   font-weight: 750;
   letter-spacing: -0.02em;
   color: var(--film-on-accent);
+}
+
+/* The thumb that taps the habits: a solid fingertip, white-rimmed so it reads on the card. */
+.film-thumb {
+  width: calc(46px * var(--u));
+  height: calc(46px * var(--u));
+  border-radius: 50%;
+  background: var(--film-ink);
+  border: calc(4px * var(--u)) solid var(--film-card);
 }
 
 /* A one-line mask: its content rises into view from below. */

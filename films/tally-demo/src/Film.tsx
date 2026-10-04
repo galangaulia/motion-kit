@@ -3,18 +3,17 @@ import type { CSSProperties } from 'react'
 import { AbsoluteFill, Html5Audio, staticFile, useCurrentFrame, useVideoConfig } from 'remotion'
 import { CameraMotionBlur } from '@remotion/motion-blur'
 import { Logotype } from '../../../brands/example'
-import { CHECKS_AT, CTA, CTA_TEXT, FPS, HOOK, HOOK_OUT, HOOK_WORDS, PRESS_AT, PRODUCT, ROWS, ROWS_AT, URL_AT, URL_TEXT, g } from './timeline'
+import { CHECKS_AT, CTA, CTA_TEXT, FPS, HOOK, HOOK_OUT, HOOK_WORDS, POINTER_IN, POINTER_OUT, PRESS_AT, PRODUCT, ROWS, ROWS_AT, URL_AT, URL_TEXT, g } from './timeline'
 
 // Demo film for the fictional Tally brand: the starter's grammar in 16 beats,
 // with real copy — springs, hits on the beat, one shape that morphs from shot to shot.
 //
-//   bar 0    hook words stack in, one per beat (heavy), then lift away on 3.75
-//   bar 1–2  the container springs in as a card; habits land on the off-beats
-//            with empty rings, then each row is pressed and its ring fills to a
-//            check on beats 8–10
-//   bar 3    the rows lift out, the card morphs into the CTA pill while green
-//            sweeps up through it; the logo lands, the destination lands, the
-//            pill takes one press
+//   bar 0    hook words stack in, one per beat (heavy); on beat 3 the hook moves
+//            up and the card opens under it, its first habit landing by 2 s
+//   bar 1–2  the hook lifts off, the card takes the centre, two more habits land;
+//            a thumb comes in and taps each ring to a check on beats 8–10
+//   bar 3    the rows lift out, the card morphs into the CTA pill; the logo
+//            lands, the destination lands, the pill takes one press
 
 const m = motion(FPS)
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v))
@@ -57,23 +56,22 @@ function Scene({ bare = false }: { bare?: boolean }) {
   const u = Math.min(width, height) / 540 // 1 at the 540 square
   const tall = height > width * 1.2
   const wide = width > height * 1.2
-  // 16:9 keeps the compact layout but zooms it to fill the wider frame (it still fits the 540 height).
-  const zoom = wide ? 1.75 : 1
 
   // Sizes per format: 9:16 is laid out for its own frame, not the square centred.
   // 9:16 keeps ~8 % side margins (clear of feed icons) and spends its height on spacing.
   const cardW = tall ? width * 0.88 : Math.min(width - 80 * u, 440 * u)
-  const rowSize = (tall ? 42 : 30) * u
-  const rowGap = (tall ? 56 : 22) * u
-  const rowPad = (tall ? 50 : 32) * u
+  const rowSize = (tall ? 42 : 36) * u
+  const rowGap = (tall ? 56 : 24) * u
+  const rowPad = (tall ? 50 : 34) * u
+  const rowLine = rowSize * 1.2
   // The card is always as tall as the rows it holds, so it never sits mostly empty.
-  const cardFor = (rows: number) => 2 * rowPad + rows * rowSize * 1.2 + (rows - 1) * rowGap
+  const cardFor = (rows: number) => 2 * rowPad + rows * rowLine + (rows - 1) * rowGap
   const pillW = (tall ? 470 : 360) * u
   const pillH = (tall ? 124 : 84) * u
-  // End card: pill, logotype (the hero, larger than the label) and URL, stacked and
-  // centred as one group. The pill travels up into its slot as it morphs.
-  const logoScale = tall ? 3.2 : 2.4
-  const urlScale = tall ? 1.9 : 1.4
+  // End card: pill, logotype (the hero: at least as tall as the pill) and URL,
+  // stacked and centred as one group. The pill travels up into its slot as it morphs.
+  const logoScale = tall ? 4.6 : 3.3
+  const urlScale = tall ? 2.1 : 1.6
   const logoH = 26 * logoScale * u
   const urlH = 29 * urlScale * u
   const gapA = (tall ? 70 : 40) * u
@@ -85,6 +83,19 @@ function Scene({ bare = false }: { bare?: boolean }) {
   // Hook: the two short words big, the long one sized to the frame's width.
   const hookBig = (tall ? 110 : 88) * u
   const hookLong = (tall ? 64 : 66) * u
+  // Opening (beats 3 → 4.5): hook above, the one-row card below, centred as a pair.
+  const hookH = (2 * hookBig + hookLong) * 0.98
+  const stackGap = 28 * u
+  const hookShift = -(cardFor(1) + stackGap) / 2
+  const cardShift = (hookH + stackGap) / 2
+  // Hook out on 4.5: one camera-like move that carries hook and card up together, on a
+  // slower critically damped spring than `heavy` (≈14 frames), since it is the film's biggest move.
+  const LIFT = { duration: 0.8, bounce: 0 }
+  // 16:9 zooms the compact layout to fill the wider frame; the camera pulls back
+  // while hook and card share it, and a little for the taller end card.
+  const zoom = wide
+    ? m.track(frame, [[0, 1.75], [g.hit(PRODUCT.from), 1.12, 'default'], [g.hit(HOOK_OUT), 1.6, LIFT], [g.hit(CTA.from, 5), 1.55, 'default']])
+    : 1
 
   // The one container: size and radius track through each shot, never cut.
   // The shrink starts 5 frames ahead of beat 12 so the emptied card never holds still.
@@ -94,24 +105,48 @@ function Scene({ bare = false }: { bare?: boolean }) {
     h: m.track(frame, [
       [0, 0],
       [g.hit(PRODUCT.from), cardFor(1)],
-      [g.hit(ROWS_AT[1]), cardFor(2)],
-      [g.hit(ROWS_AT[2]), cardFor(3)],
+      // Grows 8 frames ahead of each new row, so the row slides into room that is already there.
+      [g.hit(ROWS_AT[1], 8), cardFor(2)],
+      [g.hit(ROWS_AT[2], 8), cardFor(3)],
       [morphAt, pillH],
     ]),
     r: m.track(frame, [[0, 0], [g.hit(PRODUCT.from), 22 * u], [morphAt, pillH / 2]]),
-    y: m.track(frame, [[0, 0], [morphAt, pillY]]),
+    y: m.track(frame, [[0, cardShift], [g.hit(HOOK_OUT), 0, LIFT], [morphAt, pillY]]),
   }
   // Colour follows the shape two frames later on a quicker spring: the two read as one
   // change, and the pill is green early.
   const accent = Math.round(clamp01(m.progress(frame, morphAt + 2, 'snappy')) * 100)
   const breathe = 1 + 0.012 * g.pulse(frame - g.beat(PRODUCT.from)) * (frame < g.beat(CTA.from) ? 1 : 0)
   const press = m.track(frame, [[0, 1], [g.hit(PRESS_AT), 0.92, 'snappy'], [g.hit(PRESS_AT) + 6, 1, 'snappy']])
-  // Rows lift out one after another just before the morph; the label waits until the pill is nearly green.
-  const rowsOut = morphAt - 8
+  // Rows lift out one after another (3 frames apart, ≈8 frames each) and are gone just as the
+  // morph begins; the label waits until the pill is nearly green.
+  const rowsOut = morphAt - 15
   const labelAt = morphAt + 5
   const label = m.progress(frame, labelAt, 'snappy')
   const logoRise = m.progress(frame, g.hit(CTA.from + 1, 6), 'heavy')
   const urlRise = m.progress(frame, g.hit(URL_AT, 6), 'heavy')
+  // Out only as far as it takes to clear the top edge, so the move stays readable.
+  const hookY = m.track(frame, [[0, 0], [g.hit(PRODUCT.from), hookShift, 'heavy'], [g.hit(HOOK_OUT), -(height / 2 + hookH / 2 + 24 * u), LIFT]])
+
+  // The thumb: in from the left of the ring column on POINTER_IN (never crossing the copy),
+  // onto each ring just before its check, pressing on the beat, then back out to the left.
+  // The fingertip rests just below-right of the ring's centre, so the ring stays visible under it.
+  const ringX = -cardW / 2 + rowPad * 0.9 + rowSize * 0.6 + rowSize * 0.5
+  const ringY = (i: number) => -cardFor(3) / 2 + rowPad + i * (rowLine + rowGap) + rowLine / 2 + rowSize * 0.42
+  const pin = g.hit(POINTER_IN)
+  const pout = g.hit(POINTER_OUT)
+  const thumb = {
+    x: m.track(frame, [[0, ringX - 200 * u], [pin, ringX, 'default'], [pout, -width * 0.6, 'default']]),
+    y: m.track(frame, [
+      [0, ringY(0) + 60 * u],
+      [pin, ringY(0), 'default'],
+      [g.hit(CHECKS_AT[0]) + 3, ringY(1), 'snappy'],
+      [g.hit(CHECKS_AT[1]) + 3, ringY(2), 'snappy'],
+      [pout, ringY(2) + 60 * u, 'default'],
+    ]),
+    press: m.track(frame, [[0, 1], ...CHECKS_AT.flatMap((c): [number, number, 'snappy'][] => [[g.hit(c) - 3, 0.78, 'snappy'], [g.hit(c) + 3, 1, 'snappy']])]),
+    appear: clamp01(m.progress(frame, pin, 'snappy')),
+  }
 
   return (
     <AbsoluteFill
@@ -124,7 +159,7 @@ function Scene({ bare = false }: { bare?: boolean }) {
             word rises out of its own line mask, and the block leaves by moving off the
             top, fully opaque: nothing in the hook fades. */}
         <AbsoluteFill className="film-center">
-          <div className="film-hook" style={{ transform: `translateY(${-m.progress(frame, g.hit(HOOK_OUT), 'heavy') * height * 0.8}px)` }}>
+          <div className="film-hook" style={{ transform: `translateY(${hookY}px)` }}>
             {HOOK_WORDS.map((word, i) => {
               // Released 6 frames ahead (not the usual 2): the line mask hides the first part of the rise.
               const rise = m.progress(frame, g.hit(HOOK.from + i, 6), 'heavy')
@@ -162,16 +197,16 @@ function Scene({ bare = false }: { bare?: boolean }) {
                   {ROWS_AT.map((beat, i) => {
                     const tap = m.track(frame, [[0, 1], [g.hit(CHECKS_AT[i]) - 3, 0.93, 'snappy'], [g.hit(CHECKS_AT[i]) + 3, 1, 'snappy']])
                     const style = enter(m, frame, g.hit(beat), { x: 56 * u, preset: 'snappy' })
-                    // Leaving: lift 80 px on its own spring, two frames after the row above; the fade
-                    // only starts once the row is well on its way.
-                    const lift = clamp01(m.progress(frame, rowsOut + i * 2, 'snappy'))
+                    // Leaving: lift 56 px on `default`, three frames after the row above; the fade
+                    // rides the second half of the move.
+                    const lift = clamp01(m.progress(frame, rowsOut + i * 3, 'default'))
                     return (
                       <div
                         key={i}
                         className="film-row"
                         style={{
-                          opacity: Number(style.opacity) * (1 - clamp01((lift - 0.4) / 0.45)),
-                          transform: `${style.transform} translateY(${-lift * 80 * u}px) scale(${tap})`,
+                          opacity: Number(style.opacity) * (1 - clamp01((lift - 0.35) / 0.5)),
+                          transform: `${style.transform} translateY(${-lift * 56 * u}px) scale(${tap})`,
                           // The press tints the label green for as long as the row is pushed in.
                           color: `color-mix(in oklch, var(--film-accent) ${Math.round(clamp01((1 - tap) / 0.07) * 100)}%, var(--film-ink))`,
                         }}
@@ -192,6 +227,19 @@ function Scene({ bare = false }: { bare?: boolean }) {
             </div>
           )}
         </AbsoluteFill>
+
+        {/* The thumb that taps each habit. Moves with travel; opacity only rides its entrance. */}
+        {frame >= pin && frame < pout + 40 && (
+          <AbsoluteFill className="film-center">
+            <div
+              className="film-thumb"
+              style={{
+                opacity: clamp01(thumb.appear * 2.5),
+                transform: `translate(${thumb.x}px, ${thumb.y}px) scale(${(0.6 + 0.4 * thumb.appear) * thumb.press})`,
+              }}
+            />
+          </AbsoluteFill>
+        )}
 
         {/* Logo, then the destination, under the pill: each rises out of its own mask. */}
         <AbsoluteFill className="film-center">

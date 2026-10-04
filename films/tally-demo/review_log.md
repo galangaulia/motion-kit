@@ -196,3 +196,64 @@ New critic subagent, all three formats. Verdict: do not ship (Stop only).
 Scores have plateaued: the hook is the same as in round 8 (Stop 8 then), so Stop now swings 7–8 between critics. Its notes for a bigger change: show the product before 2 s (open the card on beat 3), make the tap a visible press or pointer, scale the 1:1 card up and make the logotype the hero. Left to the film's owner (CLAUDE.md gate 4).
 
 Owner's call (2026-10-03): ship this version. Scores have plateaued; every score but Stop is 8+, and the hook is unchanged from round 8.
+
+## Round 11 — 2026-10-04 (bigger change, after the owner asked to improve Stop)
+
+Changes, from rounds 9–10's notes:
+- The product shows before 2 s: on beat 3 the hook moves up and the card opens under it, its first habit landing on 3.5 (≈1.75 s); on 4.5 the hook lifts off and the card takes the centre (16:9: the camera pulls back to 1.3× for the pair).
+- A visible tap: a white-rimmed fingertip comes in on beat 7, rests beside each ring and presses on its check beat (8–10), then leaves on 10.5.
+- 1:1 rows 30 → 36 px (card filled); the card grows 8 frames ahead of each new row.
+- Logotype is the end card's hero: at least as tall as the pill (3.3×, 4.6× in 9:16).
+- A soft whoosh as the hook lifts.
+
+| Format | Stop | Read | Change | Moves | Layout | Brand | Sound |
+|---|---|---|---|---|---|---|---|
+| 1:1 | 8 | 9 | 9 | 8 | 8 | 9 | 7 |
+| 9:16 | 8 | 9 | 9 | 8 | 8 | 9 | 7 |
+| 16:9 | 8 | 8 | 9 | 8 | 8 | 9 | 7 |
+
+Verdict: do not ship (Sound). Stop is now 8 everywhere. Costliest: the new `lift` cue clears the bed by only +0.4 dB (row-1's tail is under it) and the card whoosh by +4.0; the thumb enters and leaves in 2–3 frames, crossing the copy; end card repeats "Tally" (taste, ≤ 1 point; not changed).
+
+Fixed (for round 12):
+- `lift` cue removed (the hook's exit is visible on its own); card whoosh +2.5 dB.
+- The thumb comes in from the left of the ring column and leaves to just past the left edge, on `default` (≈ 7 frames in, 5 out), never crossing the copy; it stays mounted until it is off the frame.
+
+## Round 12 — 2026-10-04
+
+| Format | Stop | Read | Change | Moves | Layout | Brand | Sound |
+|---|---|---|---|---|---|---|---|
+| 1:1 | 7 | 8 | 8 | 8 | 7 | 9 | 8 |
+| 9:16 | 7 | 9 | 8 | 8 | 8 | 9 | 8 |
+| 16:9 | 7 | 8 | 8 | 8 | 7 | 9 | 8 |
+
+Verdict: do not ship. Sound fixed (lowest cue +4.9 dB). Stop and Layout swung back to 7 on an opening unchanged from round 11 (8 then): critic variance. Its concrete notes: the thumb reads as a small dot, the ring is small, the 16:9 URL is small; the shotlist still promised the removed hook-lift whoosh.
+
+Fixed (for round 13, the last before the owner decides):
+- Thumb 36 → 46 px with a 4 px rim; ring/check 1.08 → 1.2 em; URL one step up (1.4 → 1.6×, 1.9 → 2.1× in 9:16); shotlist no longer lists the hook-lift whoosh.
+
+## Round 13 — 2026-10-04
+
+| Format | Stop | Read | Change | Moves | Layout | Brand | Sound |
+|---|---|---|---|---|---|---|---|
+| 1:1 | 8 | 9 | 9 | 7 | 8 | 9 | 8 |
+| 9:16 | 8 | 9 | 9 | 7 | 8 | 9 | 8 |
+| 16:9 | 8 | 8 | 9 | 7 | 7 | 9 | 8 |
+
+Verdict: do not ship. Stop holds at 8. Costliest: the hook is thrown off the top in ≈5 frames (largest move, silent); rows blink out in ≈2 frames, then the card sits empty f173–176; 16:9's hook-plus-card pull-back runs 25–40 px from the edges. Stopped here for the owner to decide.
+
+Fixed (for round 14, owner chose one more round):
+- Hook out on 4.5 as one camera-like move: hook and card ride the same slower critically damped spring (duration 0.8, ≈14 frames) and the hook travels only as far as it takes to clear the top; a whoosh sits under it (+7.0 dB over the bed, row-1's tail and all).
+- Rows lift 56 px on `default`, three frames apart, the fade riding the second half; the last is gone as the morph starts.
+- 16:9 pulls back to 1.12× (was 1.3×) while hook and card share the frame, for ≈60 px margins.
+
+## Round 14 — 2026-10-04
+
+| Format | Stop | Read | Change | Moves | Layout | Brand | Sound |
+|---|---|---|---|---|---|---|---|
+| 1:1 | 7 | 9 | 9 | 8 | 8 | 9 | 8 |
+| 9:16 | 7 | 9 | 9 | 8 | 7 | 9 | 8 |
+| 16:9 | 7 | 8 | 9 | 8 | 7 | 9 | 8 |
+
+Verdict: do not ship. Round 13's three issues are fixed (Moves 7 → 8). Stop on the same opening has now scored 8, 7, 8, 7 across rounds 11–14, and 9:16 Layout 8, 8, 8, 7 on a layout unchanged since round 11; on 16:9 round 13 asked to pull back further and this round to pull back less. Read as a plateau. This round's one new structural idea: tap row 1 by beat 5 (≈2.5 s) so "one tap" shows sooner. Stopped for the owner.
+
+Owner's call (2026-10-04): ship this version. Scores have plateaued (Stop 7–8 between critics on an unchanged opening); against round 10 it shows the product by 1.75 s, a visible tap, and slower, readable exits.
