@@ -15,6 +15,7 @@ different job with its own engine: it lives in [broll-kit](https://github.com/ga
 - `brands/<name>` brand.json (voice, proof rules, CTA), synced tokens + fonts, `index.tsx` (fonts, logo, CSS with `--film-*` roles)
 - `films/<slug>` one Remotion project per film: brief, shotlist, review log, `src/timeline.ts`, `scripts/build-audio.mjs`
 - `templates/` the film starter + brief / shotlist / review log / style guide
+- `AGENTS.md`, `GEMINI.md`, `.agents/skills/` the way in for other agents (Codex, Gemini CLI, Cursor, Copilot). When a rule or the skill starts leaning on a Claude Code feature, say in `AGENTS.md` how to do it without one.
 - `docs/` guides for users of the kit: `brand.md` (bring your own design system), `sound.md` (customize the soundtrack)
 - `vendor/` third-party kits, read-only, git-ignored. Check each one's licence before reusing anything (see `vendor/README.md`); a kit without a licence is reference only.
 - `studio/` optional private work (brands + films) with the same layout, in its own git repo and ignored here. Never `git add -f` anything under it.

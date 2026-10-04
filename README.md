@@ -15,8 +15,10 @@
 A small motion studio: films made in code with [Remotion](https://remotion.dev),
 on shared springs, a beat grid, synthesized sound and a scored critique loop.
 Open [Claude Code](https://claude.com/claude-code) in this folder and
-`CLAUDE.md` + the `/reel` skill load automatically. For motion-graphic B-roll
-on a talking-head video you already have, see [broll-kit](https://github.com/galangaulia/broll-kit).
+`CLAUDE.md` + the `/reel` skill load automatically. Codex, Gemini CLI, Cursor
+or Copilot work too: they start from `AGENTS.md` (Gemini from `GEMINI.md`),
+which points to the same rules and skill. For motion-graphic B-roll on a
+talking-head video you already have, see [broll-kit](https://github.com/galangaulia/broll-kit).
 
 ```text
 /reel 15-second teaser for Tally, 1:1 and 9:16, synthesized music
@@ -26,7 +28,8 @@ on a talking-head video you already have, see [broll-kit](https://github.com/gal
 
 ```text
 CLAUDE.md               house rules (motion, rhythm, look, sound, gates)
-.claude/skills/reel/    the /reel workflow (films, Remotion)
+AGENTS.md · GEMINI.md   the way in for other agents (Codex, Gemini CLI, Cursor, Copilot)
+.claude/skills/reel/    the /reel workflow (films, Remotion), linked from .agents/skills/
 packages/
   core/                 springs (motion, track, swapAlpha), beat grid, enter/exit, loadFonts
   audio/                synth voices, WAV I/O, BS.1770 loudness, mixdown (duck, limit, -14 LUFS)
