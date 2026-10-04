@@ -21,10 +21,13 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from types import SimpleNamespace
+from xml.sax.saxutils import escape
 
 import numpy as np
-from manim import Group, ManimColor, Scene, Text, UpdateFromAlphaFunc, config, linear
+from manim import Group, ManimColor, MarkupText, Scene, SVGMobject, Text, UpdateFromAlphaFunc, config, linear
+from manim.mobject.text.text_mobject import TEXT2SVG_ADJUSTMENT_FACTOR
 from manimpango import register_font
 
 from .beats import grid
@@ -132,11 +135,30 @@ class FrameScene(Scene):
         """A brand colour role: bg, card, ink, ink2, accent, onAccent, line."""
         return ManimColor(self.film.colors[role])
 
-    def text(self, words: str, size: float, weight: int = 400, role: str = "ui", color: str = "ink", **kwargs) -> Text:
-        """Words in a brand face (role display / ui / mono) at `size` CSS px."""
+    def text(self, words: str, size: float, weight: int = 400, role: str = "ui", color: str = "ink",
+             tracking: float = 0.0, **kwargs) -> Text:
+        """
+        Words in a brand face (role display / ui / mono) at `size` CSS px, with
+        `tracking` in em like CSS letter-spacing (-0.035 for tight display type).
+        """
         family = self.film.fonts.get(role) or self.film.fonts["ui"]
-        return Text(words, font=family, weight=WEIGHTS[weight], font_size=size * self.u * PX_TO_FONT_SIZE,
-                    color=self.color(color), **kwargs)
+        font_size = size * self.u * PX_TO_FONT_SIZE
+        style = dict(font=family, weight=WEIGHTS[weight], font_size=font_size, color=self.color(color), **kwargs)
+        if not tracking:
+            return Text(words, **style)
+        # Pango's letter_spacing is in 1/1024 px (at 96 dpi) of the point size Manim
+        # renders at; matched against Chrome's letter-spacing to within ~1 %.
+        spacing = round(tracking * font_size / TEXT2SVG_ADJUSTMENT_FACTOR * 1024 * 96 / 72)
+        return MarkupText(f'<span letter_spacing="{spacing}">{escape(words)}</span>', **style)
+
+    def svg(self, path: str, scale: float = 1.0) -> SVGMobject:
+        """An SVG whose px are half-size px (times `scale`), e.g. the brand's logo."""
+        mob = SVGMobject(path)
+        with open(path, encoding="utf-8") as f:
+            height = re.search(r'<svg[^>]*\sheight="([\d.]+)', f.read())
+        if height:
+            mob.scale_to_fit_height(self.px(float(height.group(1)) * scale))
+        return mob
 
     def place(self, mob, x: float, y: float, move: Move = STILL, scale: float = 1.0, opacity: float = 1.0):
         """Centre `mob` on (x, y) half-size px, moved, scaled and faded by `move`."""

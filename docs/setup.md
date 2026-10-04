@@ -96,17 +96,20 @@ the `/reel` skill load on their own. Other agents start from `AGENTS.md`.
 
 ## Platforms
 
-Each of these renders and reviews a film on every engine: Linux, Windows and
-the Intel Mac on CI for every change, Apple Silicon on the Mac the kit is made on.
+Each of these renders and reviews a film on every engine: Linux (x64 and ARM),
+Windows and the Intel Mac on CI for every change, Apple Silicon on the Mac the
+kit is made on.
 
 | | Remotion | HyperFrames | Manim |
 |---|---|---|---|
 | macOS, Apple Silicon | yes | yes | yes |
 | macOS, Intel | yes | yes | yes |
 | Linux x64 | yes | yes | yes |
+| Linux ARM (aarch64) | yes | yes | yes |
 | Windows x64 | yes | yes | yes |
 
-Linux on ARM isn't covered: Manim's environment isn't locked for it.
+HyperFrames on Linux ARM runs Chrome 154 rather than the 152 it pins elsewhere:
+Chrome for Testing has no ARM build of 152.
 
 ## Disk space
 

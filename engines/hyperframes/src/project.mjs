@@ -37,10 +37,14 @@ export function quietEnv(env = process.env) {
 }
 
 // The chrome-headless-shell hyperframes 0.8.121 manages (its CHROME_VERSION, and
-// the last build macOS 12 runs) — bump with it. Installed into HyperFrames' own
-// cache, and handed to every render and snapshot by path, so no machine falls
-// back to its system Chrome.
-const CHROME = process.platform === 'darwin' && Number.parseInt(release(), 10) < 22 ? '150.0.7871.124' : '152.0.7977.30'
+// the last build macOS 12 runs) — bump with it. Chrome for Testing only builds
+// for Linux on ARM from 153 on, so there it is the stable release after the pin.
+// Installed into HyperFrames' own cache and handed to every render and snapshot
+// by path, so no machine falls back to its system Chrome.
+const CHROME =
+  process.platform === 'linux' && process.arch === 'arm64' ? '154.0.8037.92'
+  : process.platform === 'darwin' && Number.parseInt(release(), 10) < 22 ? '150.0.7871.124'
+  : '152.0.7977.30'
 const CHROME_CACHE = join(homedir(), '.cache', 'hyperframes', 'chrome')
 
 /** The pinned headless shell's path, downloading it first if it isn't cached. */

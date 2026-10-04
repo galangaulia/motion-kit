@@ -35,6 +35,7 @@
       "weight": "100 900"
     }
   ],
+  "logo": "logo.svg",
   "deliver": {
     "to": "~/Videos/Tally",
     "note": "Finished films are copied here by `npm run deliver -- <film>` (one folder per film)."

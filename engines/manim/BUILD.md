@@ -48,8 +48,11 @@ class Clip(FrameScene):
 - **Layout is in the half-size px every engine uses:** `self.at(x, y)` (origin top
   left, y down), `self.px(n)`; the frame is `self.film.width × self.film.height`.
 - **Brand only:** `self.text(words, size_px, weight, role="display"|"ui"|"mono",
-  color="ink")` sets type in the brand's faces at CSS sizes; `self.color(role)` is
-  a `--film-*` colour (`bg`, `card`, `ink`, `ink2`, `accent`, `onAccent`, `line`).
+  color="ink", tracking=0)` sets type in the brand's faces at CSS sizes, with
+  `tracking` in em like CSS `letter-spacing` (it matches Chrome to about 1 %);
+  `self.color(role)` is a `--film-*` colour (`bg`, `card`, `ink`, `ink2`,
+  `accent`, `onAccent`, `line`); `self.svg(path, scale)` places an SVG whose px
+  are half-size px.
 - **Motion:** `self.m` is `motion(FPS)` (springs, `track`, `swap_alpha`), `self.g`
   the beat grid, `enter` / `exit` give a `Move` for `self.place(mob, x, y, move)`.
   The Python port matches the TypeScript (`pixi run test` checks it).
@@ -58,10 +61,9 @@ class Clip(FrameScene):
 - **Numbers:** `DecimalNumber` and `Integer` need LaTeX, which isn't installed; use
   `self.text(str(count_up(p, 120)))`, or pass `mob_class=Text`. `Tex` / `MathTex`
   need LaTeX too.
-- Manim's `Text` has no letter-spacing, so tightly tracked display type sets a
-  little wider than in a browser.
-- The logo is `brand.json` → `logo` (an SVG with its text converted to outlines),
-  or the brand's name as a wordmark when there is none.
+- The logo is `brand.json` → `logo` (an SVG with its text converted to outlines,
+  like `brands/example/logo.svg`), placed with `self.svg(self.film.logo)`, or the
+  brand's name as a wordmark when there is none.
 
 ## A whole film
 

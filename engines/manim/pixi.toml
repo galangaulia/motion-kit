@@ -6,7 +6,7 @@
 [workspace]
 name = "motion-kit-manim"
 channels = ["conda-forge"]
-platforms = ["osx-arm64", "osx-64", "linux-64", "win-64"]
+platforms = ["osx-arm64", "osx-64", "linux-64", "linux-aarch64", "win-64"]
 
 [dependencies]
 python = "3.12.*"
@@ -17,6 +17,12 @@ av = "*"
 pkg-config = "*"
 fonttools = "*"
 brotli-python = "*"
+# Manim's native dependencies come from conda-forge too: PyPI has no Linux ARM
+# wheels for some of them, and a source build there needs X11 headers.
+moderngl = "*"
+glcontext = "*"
+skia-pathops = "*"
+mapbox_earcut = "*"
 
 [pypi-dependencies]
 manim = "==0.21.0"
