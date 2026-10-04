@@ -14,7 +14,7 @@ each time from what build() left (engines/manim/BUILD.md). Positions and sizes
 are half-size px, as in the other engines' starters.
 """
 
-from manim import RIGHT, Circle, RoundedRectangle, SVGMobject, VGroup
+from manim import RIGHT, Circle, RoundedRectangle, VGroup
 
 from motionkit import FrameScene, enter, exit
 
@@ -26,7 +26,7 @@ class FilmScene(FrameScene):
         k = self.k = min(self.W, self.H) / 540  # 1 at the 540 square
 
         # Hook words, wrapped the way the CSS starter wraps them.
-        self.words = [self.text(w, 56 * k, 800, role="display") for w in tl.HOOK_WORDS]
+        self.words = [self.text(w, 56 * k, 800, role="display", tracking=-0.035) for w in tl.HOOK_WORDS]
         self.word_at = self.wrap(self.words, width=0.9 * self.W, gap=14 * k, line=56 * 1.05 * k)
 
         # The one container, rebuilt every frame at its tracked size; rows and CTA ride on it.
@@ -40,9 +40,9 @@ class FilmScene(FrameScene):
 
         # The brand's logo SVG when brand.json names one, else its name as a wordmark.
         if self.film.logo:
-            self.logo = SVGMobject(self.film.logo).scale_to_fit_height(self.px(22 * k))
+            self.logo = self.svg(self.film.logo, k)
         else:
-            self.logo = self.text(self.film.name, 26 * k, 800, role="display")
+            self.logo = self.text(self.film.name, 26 * k, 800, role="display", tracking=-0.03)
 
         self.add(*self.words, self.box, *self.rows, self.cta, self.logo)
 
