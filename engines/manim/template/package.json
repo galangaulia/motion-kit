@@ -1,0 +1,29 @@
+{
+  "name": "@films/__SLUG__",
+  "private": true,
+  "type": "module",
+  "motionKit": {
+    "engine": "manim",
+    "brand": "__BRAND__"
+  },
+  "scripts": {
+    "audio": "node scripts/build-audio.mjs",
+    "studio": "npm run audio && motion-manim preview",
+    "preview": "npm run audio && motion-manim preview",
+    "render": "npm run audio && motion-manim render Square",
+    "render:all": "npm run audio && motion-manim render Square Vertical Wide",
+    "render:final": "npm run audio && motion-manim render Square Vertical Wide --final",
+    "review": "motion-review --comp Square --video out/square.mp4",
+    "stills": "motion-review --comp Square --stills",
+    "typecheck": "tsc -p ."
+  },
+  "dependencies": {
+    "@motion-kit/audio": "*",
+    "@motion-kit/core": "*",
+    "@motion-kit/manim": "*"
+  },
+  "devDependencies": {
+    "@motion-kit/review": "*",
+    "typescript": "^5.6.0"
+  }
+}

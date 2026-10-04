@@ -102,3 +102,38 @@ jobs:
           stills=$(ls -d films/ci-hf/out/review/*-Square-stills/ | head -1)
           for f in stills.png phone.png report.md; do test -s "$stills$f" || { echo "missing $stills$f"; exit 1; }; done
           echo "ok: $dir $stills"
+
+  manim:
+    name: Manim engine (parity, clips, render + review)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      # pixi brings Python, cairo, pango and PyAV from conda-forge (engines/manim/pixi.lock).
+      - name: Install pixi
+        run: |
+          curl -fsSL https://pixi.sh/install.sh | PIXI_VERSION=v0.81.0 PIXI_NO_PATH_UPDATE=1 sh
+          echo "$HOME/.pixi/bin" >> "$GITHUB_PATH"
+      - run: npm install --no-audit --no-fund
+      # The Python springs, beat grid and hash against the TypeScript.
+      - run: pixi run --manifest-path engines/manim/pixi.toml test
+      # A clip comes out as VP9 with real alpha, at its size, for its beats.
+      - run: node engines/manim/test/clip.mjs
+      - name: Scaffold, render and review a Manim film
+        run: |
+          npm run new -- ci-mn --brand example --engine manim
+          npm run typecheck -w @films/ci-mn
+          npm run render -w @films/ci-mn
+          npm run review -w @films/ci-mn -- --strict
+          npm run stills -w @films/ci-mn
+      - name: Check the review and the stills produced their sheets
+        run: |
+          dir=$(ls -d films/ci-mn/out/review/*-Square/ | head -1)
+          for f in contact.png phone.png report.md; do test -s "$dir$f" || { echo "missing $dir$f"; exit 1; }; done
+          grep -q '^| Glitches' "${dir}report.md" || { echo "no motion checks in ${dir}report.md"; exit 1; }
+          stills=$(ls -d films/ci-mn/out/review/*-Square-stills/ | head -1)
+          for f in stills.png phone.png report.md; do test -s "$stills$f" || { echo "missing $stills$f"; exit 1; }; done
+          echo "ok: $dir $stills"

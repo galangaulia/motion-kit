@@ -138,7 +138,9 @@ export async function build({ dir = process.cwd(), formats, preview = false } = 
     copyFileSync(wav, join(assets, 'audio', 'soundtrack.wav'))
   }
 
-  const body = readFileSync(join(dir, 'src', 'film.html'), 'utf8').replaceAll('{{logo}}', brand.logo)
+  const body = readFileSync(join(dir, 'src', 'film.html'), 'utf8')
+    .replaceAll('{{logo}}', brand.logo)
+    .replace(/\{\{clip:([\w-]+)\}\}/g, (_, name) => clipTag(f, name))
   const shared = { fps: f.timeline.FPS, frames: f.timeline.TOTAL_FRAMES, body, css: brand.css.map((c) => `brand/${c}`), fontsCss: brand.fontsCss, audio }
   // HyperFrames swaps in a stand-in face when a font URL is wrong and renders on,
   // so check every face the page asks for is really there.
@@ -151,6 +153,22 @@ export async function build({ dir = process.cwd(), formats, preview = false } = 
   }
   rmSync(assets, { recursive: true, force: true })
   return { ...f, out, projects }
+}
+
+/**
+ * A Manim clip (public/clips/<name>.webm, from `npm run clips`) as a timed
+ * <video>, on the beats of CLIPS.<name> in src/timeline.ts. Its position is the
+ * film's: style #clip-<name> in film.css.
+ */
+function clipTag(f, name) {
+  const spec = f.timeline.CLIPS?.[name]
+  if (!spec) throw new Error(`{{clip:${name}}} needs CLIPS.${name} in src/timeline.ts: { from, to } in beats, { width, height } in half-size px`)
+  if (!existsSync(join(f.dir, 'public', 'clips', `${name}.webm`))) throw new Error(`public/clips/${name}.webm is missing: run npm run clips`)
+  const g = f.timeline.g
+  const start = g.beat(spec.from)
+  const frames = g.beat(spec.to) - start
+  const fps = f.timeline.FPS
+  return `<video id="clip-${name}" class="clip" src="public/clips/${name}.webm" muted playsinline data-start="${start / fps}" data-duration="${frames / fps}" style="position:absolute;width:${spec.width}px;height:${spec.height}px"></video>`
 }
 
 /** The 1080p preset a half-size format renders to at 2×. */

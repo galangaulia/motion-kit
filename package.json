@@ -11,7 +11,7 @@
   ],
   "scripts": {
     "brand:sync": "node scripts/brand-sync.mjs",
-    "test": "node packages/core/test.mjs && node packages/audio/test.mjs && node packages/media/test.mjs && node packages/review/test.mjs && node scripts/brand-export.test.mjs",
+    "test": "node packages/core/test.mjs && node packages/audio/test.mjs && node packages/media/test.mjs && node packages/review/test.mjs && node scripts/brand-export.test.mjs && node engines/manim/test/fixture.mjs",
     "new": "node scripts/new-film.mjs",
     "deliver": "node scripts/deliver.mjs"
   },
