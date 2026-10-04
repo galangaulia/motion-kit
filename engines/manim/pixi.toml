@@ -17,6 +17,12 @@ av = "*"
 pkg-config = "*"
 fonttools = "*"
 brotli-python = "*"
+# Manim's native dependencies come from conda-forge too: PyPI has no Linux ARM
+# wheels for some of them, and a source build there needs X11 headers.
+moderngl = "*"
+glcontext = "*"
+skia-pathops = "*"
+mapbox_earcut = "*"
 
 [pypi-dependencies]
 manim = "==0.21.0"
