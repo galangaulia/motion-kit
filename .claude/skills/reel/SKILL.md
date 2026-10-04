@@ -1,6 +1,6 @@
 ---
 name: reel
-description: Make a motion-graphics film (launch reel, feature teaser, social ad, product promo) in this studio repo with Remotion, springs, a beat grid, synthesized sound and a scored critique loop. Use when the user asks for a video, reel, motion piece, teaser or promo, or says "/reel".
+description: Make a motion-graphics film (launch reel, feature teaser, social ad, product promo, explainer) in this studio repo with Remotion, HyperFrames or Manim, springs, a beat grid, synthesized sound and a scored critique loop. Use when the user asks for a video, reel, motion piece, teaser or promo, or says "/reel".
 ---
 
 # /reel
@@ -20,14 +20,19 @@ call, so the person answers once:
 - length (default 15–20 s)
 - reference film or frame to learn from (optional, strongly encouraged)
 - music: synthesized (default) or a supplied licensed track
+- engine: Remotion (default), HyperFrames (HTML, no React) or Manim (a diagram
+  or maths explainer), and whether any part is a Manim clip inside the film
+  (`docs/engines.md`). Only ask when the request hints at it; otherwise Remotion.
 
 ## 2. Scaffold
 
 ```bash
-npm run new -- <slug> --brand <brand>
+npm run new -- <slug> --brand <brand> [--engine hyperframes|manim]
 ```
 
-Fill the new film's `brief.md` from the intake.
+Fill the new film's `brief.md` from the intake, and read
+`engines/<engine>/BUILD.md` before writing any picture code: it says how the
+house rules map onto that engine and where its files are.
 
 ## 3. Reference (if given)
 
@@ -54,8 +59,9 @@ yes.
 ## 6. Key stills → STOP
 
 Write `src/timeline.ts` far enough to place the shots, list the key stills in
-its `STILLS`, and build only those frames in `src/Film.tsx`: layout, type,
-colour, the real product. Motion can stay rough. Then:
+its `STILLS`, and build only those frames in the picture (`src/Film.tsx`,
+`src/film.html` + `film.ts`, or `src/film.py`): layout, type, colour, the real
+product. Motion can stay rough. Then:
 
 ```bash
 npm run stills
@@ -67,13 +73,18 @@ and wait for approval of the look.** No animating the rest before a yes.
 
 ## 7. Build
 
-- `src/timeline.ts`: every beat the shotlist names.
-- `src/Film.tsx`: springs from `motion(FPS)`, `enter`/`exit`, `track()` for
+- `src/timeline.ts`: every beat the shotlist names (and `CLIPS` for any Manim clip).
+- The picture: springs from `motion(FPS)`, `enter`/`exit`, `track()` for
   morphing containers, `swapAlpha()` for text inside them, `g.hit(n)` for hits,
   `g.pulse()` for kick-synced breathing, `zoom()` for the camera (a punch-in on
   impacts), `trackVelocity()` then `release()` where motion crosses a cut or a
-  drag lets go, `Flood` to change shots without a dissolve. Layout from
-  `useVideoConfig()` so every format reframes instead of cropping.
+  drag lets go, `Flood` (Remotion) to change shots without a dissolve. Manim has
+  the same helpers in snake_case (`swap_alpha`, `track_velocity`). Lay out from
+  the format's size (`useVideoConfig()`, the page root's size, `self.film`) so
+  every format reframes instead of cropping.
+- Manim clips: `manim/<name>.py` with `class Clip(FrameScene)`, placed with
+  `<ManimClip>` (Remotion) or `{{clip:<name>}}` (HyperFrames); `npm run render`
+  builds them first.
 - `scripts/build-audio.mjs`: bed on the same grid, one cue per visual hit,
   `mixdown()` to −14 LUFS.
 
@@ -110,5 +121,5 @@ hand the user the film, the score history and the open issues to decide.
 
 `npm run render:all` for the requested formats, review each format once with
 `--strict` (`motion-review --comp Vertical --video out/vertical.mp4 --strict`),
-then hand the user the files plus the last review's scores. Don't commit
-renders.
+then `npm run render:final` (motion blur; Manim finals have none) and hand the
+user the files plus the last review's scores. Don't commit renders.

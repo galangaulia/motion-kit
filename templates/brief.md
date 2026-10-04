@@ -11,6 +11,9 @@ Fill this before any code. Every later decision gets checked against it.
 ## Formats and length
 <!-- e.g. 1:1 for LinkedIn first, then 9:16. 15–20 s. -->
 
+## Engine
+<!-- remotion (default) | hyperframes | manim, and why; Manim clips inside the film, if any (docs/engines.md). -->
+
 ## Brand
 - Brand: `brands/__BRAND__` (voice, proof rules, CTA in brand.json)
 - Claims allowed on screen:

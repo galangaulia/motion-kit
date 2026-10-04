@@ -10,6 +10,7 @@ Start here.
 1. [`CLAUDE.md`](CLAUDE.md), in full, before touching a film. These are the house rules (determinism, movement, timing, picture, sound, brand truth, workflow gates) and they bind every agent, not only Claude.
 2. `CLAUDE.local.md`, if it exists: notes for this machine only, git-ignored.
 3. Working under `studio/`? It is a separate private repo with rules of its own: read `studio/AGENTS.md` as well.
+4. Building a HyperFrames or Manim film (`package.json` → `motionKit.engine`)? Read `engines/<engine>/BUILD.md` too. Their tools are plain command-line installs: a full ffmpeg for HyperFrames, and pixi for Manim (`curl -fsSL https://pixi.sh/install.sh | PIXI_NO_PATH_UPDATE=1 sh`); see `docs/engines.md`.
 
 ## Where the rules assume Claude Code
 
