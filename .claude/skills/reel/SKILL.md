@@ -83,8 +83,9 @@ and wait for approval of the look.** No animating the rest before a yes.
   the format's size (`useVideoConfig()`, the page root's size, `self.film`) so
   every format reframes instead of cropping.
 - Manim clips: `manim/<name>.py` with `class Clip(FrameScene)`, placed with
-  `<ManimClip>` (Remotion) or `{{clip:<name>}}` (HyperFrames); `npm run render`
-  builds them first.
+  `<Clip>` (Remotion) or `{{clip:<name>}}` (HyperFrames); `npm run render`
+  builds them first. A transparent webm from outside the kit (a cut-out of real
+  footage) drops into `public/clips/` and plays the same way: CLAUDE.md, Picture.
 - `scripts/build-audio.mjs`: bed on the same grid, one cue per visual hit,
   `mixdown()` to −14 LUFS.
 

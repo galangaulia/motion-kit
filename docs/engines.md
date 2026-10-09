@@ -29,6 +29,13 @@ diagram or an equation, or use it for just that part: a **Manim clip** is a
 transparent segment drawn by Manim and placed in a Remotion or HyperFrames film
 on its beats ([engines/manim/BUILD.md](../engines/manim/BUILD.md)).
 
+That slot takes any transparent webm, not only Manim's. If a shot needs real
+footage with the background removed — a hand, a product, a person — cut it out
+in [broll-kit](https://github.com/galangaulia/broll-kit) (its object-separation
+skill, then `scripts/cutout.py`), drop the webm in the film's `public/clips/`
+and give it a `CLIPS` entry. `npm run clips` only builds what it finds in
+`manim/`, so it leaves yours alone. No engine here grows a dependency for it.
+
 How each engine meets the house rules: `engines/<engine>/BUILD.md`.
 
 ## Installing what each one needs

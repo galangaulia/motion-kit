@@ -1,7 +1,7 @@
 {
   "name": "@motion-kit/remotion",
   "private": true,
-  "description": "Remotion as a motion-kit engine: the film template (template/), <ManimClip> for clips made with the Manim engine, and the review's stills — bundle once, render any frame at any scale.",
+  "description": "Remotion as a motion-kit engine: the film template (template/), <Clip> for transparent clips (a Manim scene, or footage cut out elsewhere), and the review's stills — bundle once, render any frame at any scale.",
   "type": "module",
   "exports": {
     "./review": "./review.mjs",

@@ -23,8 +23,10 @@ for. Scaffold with `npm run new -- <slug> --brand <name>`.
 - Finals wrap the moving content in `<CameraMotionBlur samples={16} shutterAngle={180}>`
   and paint the background once underneath it (stacked copies of a flat
   background drift its colour).
-- A Manim clip is `<ManimClip name clip={CLIPS.<name>} g={g} style={{ left, top }} />`
-  from `@motion-kit/remotion/clip` (engines/manim/BUILD.md).
+- A clip is `<Clip name clip={CLIPS.<name>} g={g} style={{ left, top }} />` from
+  `@motion-kit/remotion/clip`: a Manim scene (engines/manim/BUILD.md), or any
+  transparent webm in `public/clips/` with a `CLIPS` entry (CLAUDE.md, Picture).
+  `ManimClip` is still exported as the old name for it.
 - A film that renders a product's own components can customise webpack in
   `webpack-override.mjs`; the review loads it too.
 
