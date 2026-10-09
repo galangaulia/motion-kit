@@ -91,7 +91,7 @@ npm run stills        # key stills at 1080, drawn for just those frames
    (beats, then half-size px). The scene's `f` is the film's frame number, so
    `self.g.hit(9)` lands on beat 9 of the film.
 3. Place it:
-   - Remotion: `<ManimClip name="formula" clip={CLIPS.formula} g={g} style={{ left: 40, top: 120 }} />`
+   - Remotion: `<Clip name="formula" clip={CLIPS.formula} g={g} style={{ left: 40, top: 120 }} />`
      from `@motion-kit/remotion/clip`;
    - HyperFrames: `{{clip:formula}}` in `src/film.html`, positioned with
      `#clip-formula { left: 40px; top: 120px; }` in `src/film.css`.
