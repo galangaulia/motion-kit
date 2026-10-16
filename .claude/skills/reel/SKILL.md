@@ -156,7 +156,16 @@ hand the user the film, the score history and the open issues to decide.
 
 ## 9. Finals
 
+If `SOURCES` in `scripts/build-audio.mjs` lists anything, check the licences
+first: open each `url` (web fetch, or ask the user to open it when the site
+blocks you), confirm the licence is the one listed and still allows the brief's
+channel, and set `checked` to today. Tell the user one line per source ("Checked
+today: Mixkit Stock Music Free License, unchanged, YouTube allowed"). If a term
+changed or the channel isn't allowed, name the file and why and swap it; never
+call an unchecked or unclear licence fine.
+
 `npm run render:all` for the requested formats, review each format once with
 `--strict` (`motion-review --comp Vertical --video out/vertical.mp4 --strict`),
 then `npm run render:final` (motion blur; Manim finals have none) and hand the
-user the files plus the last review's scores. Don't commit renders.
+user the files plus the last review's scores, and `CREDITS.txt` when there is
+one. Don't commit renders.

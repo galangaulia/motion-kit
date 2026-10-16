@@ -2,7 +2,8 @@
 
 Every film builds its own soundtrack in code. There are no stock samples in the
 kit: the music bed and every effect are synthesized by `@motion-kit/audio`, so
-a film can sound like anything — and nothing in it belongs to someone else.
+a film can sound like anything — and nothing in it belongs to someone else
+unless you bring it in (see "Sound from outside the kit").
 
 ## How it works
 
@@ -56,11 +57,42 @@ empty stereo buffer to draw into.
    Convert other formats first: `ffmpeg -i click.mp3 click.wav` (or, without an
    ffmpeg of your own, Remotion's: `npx remotion ffmpeg -i click.mp3 click.wav`).
 5. **A licensed music track as the bed:** same folder, `readWav()` it and pass it
-   as `bed`. Write its source and licence in the film's `brief.md`.
+   as `bed`. List it, and any sample from step 4, in `SOURCES` (below).
 6. **Mix:** `mixdown()` takes `bedGain`, `duck: { depth, attack, release }`,
    `lufs` and `ceiling`.
 
 Don't put inputs in `public/audio/`: the script empties that folder every run.
+
+## Sound from outside the kit
+
+Every file in `sound/` gets an entry in `SOURCES` at the top of
+`build-audio.mjs`, which writes it to `public/audio/sources.json`:
+
+```js
+const SOURCES = [
+  {
+    file: 'sound/bed.wav',
+    kind: 'music', // music | sfx | voice
+    title: 'Morning Light',
+    author: 'A. Composer',
+    url: 'https://…', // the page it came from, where its licence is shown
+    licence: 'Mixkit Stock Music Free License',
+    checked: '2026-10-16', // the day you last opened that page and read the licence
+  },
+]
+```
+
+Licences change, so the check is a habit, not a one-off: before the finals,
+open each `url`, confirm the licence still allows the brief's channel (YouTube,
+paid ads, broadcast…), and update `checked`. Non-commercial (NC) and
+no-derivatives (ND) licences are out for a brand film; CC BY is fine but needs
+a credit in the post.
+
+`npm run review` lists the sources with a ✓, ⚠ (credit needed) or ✗ each and
+writes `CREDITS.txt` next to `report.md`. `--strict` fails on any ✗, which
+includes a `checked` date more than 30 days old. `npm run deliver` refuses to
+copy the finals while a ✗ is left, and puts `CREDITS.txt` next to them, ready
+to paste into the post's description.
 
 ## A house sound for a brand
 

@@ -13,16 +13,18 @@
 //   report.md    motion checks on the rendered video (glitches, snaps, cuts against
 //                the beat, freezes, stretches with no new picture, flashes), loudness,
 //                sample and true peak, clipping, per-cue lift over the bed, how well
-//                the music's own kicks line up with the declared beat grid, and the
-//                scorecard to fill in (CLAUDE.md "Review loop")
+//                the music's own kicks line up with the declared beat grid, the
+//                licence of any sound from outside the kit (public/audio/sources.json),
+//                and the scorecard to fill in (CLAUDE.md "Review loop")
 //   flags.png    the frames before, at and after each moment the motion checks flag
+//   CREDITS.txt  the outside sound, for the post's description (only when there is some)
 //
 // --strict exits 1 (after writing everything) when the film flashes past WCAG
-// 2.3.1, its true peak is over −1 dBTP, or the music is audibly off the beat grid
-// (median kick offset over a quarter of a beat, with most beats found). Synthesized
-// music lines up by construction; this only ever fires for a bought or licensed
-// track whose real tempo drifted from the declared BPM. The other checks only
-// inform the critic.
+// 2.3.1, its true peak is over −1 dBTP, the music is audibly off the beat grid
+// (median kick offset over a quarter of a beat, with most beats found), or a sound
+// source has a licence problem (missing, non-commercial, no-derivatives, or checked
+// more than 30 days ago). Synthesized music passes the last two by construction.
+// The other checks only inform the critic.
 //
 // --stills is the key-stills gate (CLAUDE.md, gate 2b): it renders only the frames
 // in src/timeline.ts's STILLS (or --frames) into out/review/<stamp>-<comp>-stills/:
@@ -39,13 +41,14 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, 
 import { createRequire } from 'node:module'
 import { tmpdir } from 'node:os'
 import { pathToFileURL } from 'node:url'
-import { join, resolve } from 'node:path'
+import { basename, join, resolve } from 'node:path'
 import { parseArgs } from 'node:util'
 import { beatAlignment, integratedLufs, peakDb, readWav, truePeakDb } from '@motion-kit/audio'
 import { checkSize, decodeFrames, extractAudio, probe } from '@motion-kit/media'
 import sharp from 'sharp'
 import { flaggedFrames, flashFailed, motionChecks, motionReport } from './motion-checks.mjs'
 import { isStoryFormat, safeOutlineSvg } from './safe-zones.mjs'
+import { checkSources, creditsText } from './sound-sources.mjs'
 
 const { values: args } = parseArgs({
   options: {
@@ -55,6 +58,7 @@ const { values: args } = parseArgs({
     every: { type: 'string' },
     phoneEvery: { type: 'string' },
     cues: { type: 'string', default: 'public/audio/cues.json' },
+    sources: { type: 'string', default: 'public/audio/sources.json' },
     // Safe-zone outline on phone.png; on by default for 9:16.
     safe: { type: 'boolean' },
     strict: { type: 'boolean' },
@@ -310,6 +314,34 @@ if (hasVideo) {
   }
 }
 
+// ── Sound sources ─────────────────────────────────────────────────────
+
+let sources = `_No \`${args.sources}\`, so sound from outside the kit isn't checked: add \`SOURCES\` to scripts/build-audio.mjs (docs/sound.md)._`
+let sourceProblems = null
+if (existsSync(args.sources)) {
+  const list = JSON.parse(readFileSync(args.sources, 'utf8'))
+  if (!list.length) {
+    sources = 'Everything was synthesized by `@motion-kit/audio`: nothing to license.'
+    sourceProblems = []
+  } else {
+    const checked = checkSources(list, { today: new Date().toISOString().slice(0, 10) })
+    sourceProblems = checked.filter((c) => c.problems.length)
+    writeFileSync(join(OUT, 'CREDITS.txt'), creditsText(list, basename(process.cwd())))
+    const cell = (v) => String(v ?? '').replaceAll('|', '\\|')
+    const verdict = ({ problems, note }) => (problems.length ? `✗ ${cell(problems.join('; '))}` : note ? `⚠ ${note}` : '✓')
+    sources = [
+      "Sound from outside the kit. Before the finals, open each page, confirm its licence still allows this film's channel, and update `checked`. `CREDITS.txt` lists them for the post's description.",
+      '',
+      '| Sound | By | Licence | Checked | |',
+      '|---|---|---|---|---|',
+      ...checked.map((c) => {
+        const s = c.source
+        return `| ${cell(s.kind ?? 'sound')}: [${cell(s.title)}](${s.url ?? ''}) | ${cell(s.author)} | ${cell(s.licence)} | ${cell(s.checked)} | ${verdict(c)} |`
+      }),
+    ].join('\n')
+  }
+}
+
 // ── Motion ────────────────────────────────────────────────────────────
 
 /** Latest change to anything under `dirs` (skipping `skip`), in ms. */
@@ -407,6 +439,10 @@ ${motion}
 
 ${audio}
 
+### Sources
+
+${sources}
+
 ## Scorecard (1–10; ships at 8+ on every row)
 
 | Question | Score | Frames that show it |
@@ -442,6 +478,7 @@ if (args.strict) {
       fails.push(`soundtrack ${beatAlign.medianErrorMs.toFixed(0)} ms off the beat grid (see report.md)`)
     }
   }
+  if (sourceProblems?.length) fails.push(`${sourceProblems.length} sound source(s) with licence problems (see report.md)`)
   if (fails.length) {
     console.error(`strict: ${fails.join('; ')}`)
     process.exitCode = 1

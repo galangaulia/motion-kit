@@ -5,6 +5,7 @@ import { grid } from '../core/src/beats.ts'
 import { checkSize } from '@motion-kit/media'
 import { flaggedFrames, flashFailed, motionChecks, motionReport, onBeat } from './src/motion-checks.mjs'
 import { isStoryFormat, safeOutline, safeOutlineSvg } from './src/safe-zones.mjs'
+import { checkSources, creditsText } from './src/sound-sources.mjs'
 
 const near = (got, want, tol, label) => assert.ok(Math.abs(got - want) <= tol, `${label}: got ${got}, want ${want}`)
 
@@ -168,6 +169,43 @@ for (const fps of [30, 60]) {
   assert.deepEqual(onBeat(61, g), { beat: 4, on: true })
   assert.equal(onBeat(63, g).on, false)
   assert.deepEqual(onBeat(63, null), { beat: null, on: null })
+}
+
+// ── Sound sources ─────────────────────────────────────────────────────
+
+{
+  const track = {
+    file: 'sound/bed.wav',
+    kind: 'music',
+    title: 'Morning Light',
+    author: 'A. Composer',
+    url: 'https://example.com/track/1',
+    licence: 'CC0 1.0',
+    checked: '2026-10-10',
+  }
+  const today = '2026-10-16'
+  const [ok] = checkSources([track], { today })
+  assert.deepEqual(ok.problems, [], 'a complete, recently checked CC0 track passes')
+  assert.equal(ok.note, null, 'CC0 needs no credit')
+
+  const [missing] = checkSources([{ ...track, url: '', checked: undefined }], { today })
+  assert.deepEqual(missing.problems, ['no url', 'no checked'], 'missing fields are named')
+
+  const [stale] = checkSources([{ ...track, checked: '2026-08-01' }], { today })
+  assert.match(stale.problems[0], /76 days ago/, 'an old licence check must be redone')
+  assert.match(checkSources([{ ...track, checked: '16/10/2026' }], { today })[0].problems[0], /isn't a YYYY-MM-DD/)
+  assert.match(checkSources([{ ...track, checked: '2026-10-20' }], { today })[0].problems[0], /in the future/)
+
+  assert.match(checkSources([{ ...track, licence: 'CC BY-NC 4.0' }], { today })[0].problems[0], /non-commercial/)
+  assert.match(checkSources([{ ...track, licence: 'CC BY-ND 4.0' }], { today })[0].problems[0], /no-derivatives/)
+  const [by] = checkSources([{ ...track, licence: 'CC BY 4.0' }], { today })
+  assert.deepEqual(by.problems, [], 'CC BY is allowed')
+  assert.equal(by.note, 'credit required in the post', 'but it needs a credit')
+
+  const credits = creditsText([track, { ...track, kind: 'whoosh', title: 'Swish' }], 'launch')
+  assert.match(credits, /^Sound in launch\n/)
+  assert.match(credits, /- music: "Morning Light" by A\. Composer, CC0 1\.0\. https:\/\/example\.com\/track\/1/)
+  assert.match(credits, /- sound: "Swish"/, 'an unknown kind reads as sound')
 }
 
 console.log('review: ok')

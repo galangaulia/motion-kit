@@ -56,7 +56,8 @@ jobs:
           node-version: 24
       - run: npm install --no-audit --no-fund
       - run: npm run render -w @films/tally-demo
-      # --strict fails the job on flashes past WCAG 2.3.1 or a true peak over −1 dBTP.
+      # --strict fails the job on flashes past WCAG 2.3.1, a true peak over −1 dBTP,
+      # music off the beat grid, or a sound source with a licence problem.
       - run: npm run review -w @films/tally-demo -- --strict
       - run: npm run stills -w @films/tally-demo
       - name: Render one motion-blurred Final frame

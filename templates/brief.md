@@ -40,7 +40,7 @@ Fill this before any code. Every later decision gets checked against it.
 
 ## Sound
 - Tempo: 120 BPM (15 frames/beat at 30 fps) unless the story needs otherwise
-- Music: synthesized | supplied track (path + licence)
+- Music: synthesized | supplied track (path + licence; also listed in `SOURCES` in scripts/build-audio.mjs)
 - Voiceover: none | …
 - Mood in three words:
 

@@ -10,6 +10,13 @@ import { BARS, CHECKS_AT, CTA, FPS, HOOK, HOOK_OUT, HOOK_WORDS, PRESS_AT, PRODUC
 
 const OUT = join(dirname(fileURLToPath(import.meta.url)), '..', 'public', 'audio')
 
+// Sound from outside the kit, one entry per file in sound/ (docs/sound.md); empty
+// when everything is synthesized. motion-review checks each licence, and
+// `npm run deliver` ships a CREDITS.txt and refuses while one is unresolved.
+const SOURCES = [
+  // { file: 'sound/bed.wav', kind: 'music', title: '…', author: '…', url: '…', licence: '…', checked: 'YYYY-MM-DD' },
+]
+
 // One chord per bar (I – V – vi – IV in C). Swap for the film's mood.
 const CHORDS = [
   [48, 55, 60, 64, 67],
@@ -71,4 +78,5 @@ rmSync(OUT, { recursive: true, force: true })
 mkdirSync(OUT, { recursive: true })
 writeWav(join(OUT, 'soundtrack.wav'), master)
 writeFileSync(join(OUT, 'cues.json'), JSON.stringify({ fps: FPS, ...report }, null, 2))
+writeFileSync(join(OUT, 'sources.json'), JSON.stringify(SOURCES, null, 2))
 console.log(`soundtrack.wav  ${report.lufs.toFixed(1)} LUFS  peak ${report.peak.toFixed(1)} dBFS  ${report.cues.length} cues`)

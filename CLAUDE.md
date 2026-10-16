@@ -81,7 +81,7 @@ computable on its own from its frame number (`useCurrentFrame()` in Remotion,
 
 ## Sound
 
-- Music and effects are made with `@motion-kit/audio`. A bought or licensed track is fine too; write its source and licence into the brief.
+- Music and effects are made with `@motion-kit/audio`. A bought or licensed track or sample is fine too: list it in `SOURCES` in `scripts/build-audio.mjs` (file, title, author, the page it came from, licence, the date that page was last checked). Non-commercial and no-derivatives licences are out. Before the finals, re-open each page, confirm the licence still allows the brief's channel, and update the date: `review --strict` and `npm run deliver` refuse a source checked more than 30 days ago, and deliver ships a `CREDITS.txt`.
 - `scripts/build-audio.mjs` places each cue from `timeline.ts` and calls `mixdown()`, which lowers the bed under cues, keeps peaks under −1 dBFS and sets the master to −14 LUFS. A film plays a single `soundtrack.wav`. The encode can lift peaks between samples, so `report.md` measures the MP4: its true peak stays at −1 dBTP or under.
 - Assume most viewers have the sound off: everything the film says must also be on screen.
 
