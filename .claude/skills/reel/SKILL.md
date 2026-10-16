@@ -17,7 +17,15 @@ call, so the person answers once:
 
 - brand, and the one-line point of the film
 - audience + channel (muted feed? sound on?) and formats (1:1, 9:16, 16:9)
-- length (default 15–20 s)
+- archetype, which sets the length (`templates/shotlist.md` has each one's
+  checks):
+  - **arc** (default, 15–20 s): hook → product → proof → CTA, a shot each
+  - **one-shape UI tour** (loops): 8–12 states of the real product in one
+    container, driven by a pointer
+  - **high-energy hype** (12–20 s): 6–8 beat-locked scenes handed over by a
+    shape, the value line as a kinetic triplet
+  - **calm product demo** (45–90 s): one line at a time, then the real UI up
+    close while it's used, a chapter per feature (ask which features)
 - reference film or frame to learn from (optional, strongly encouraged)
 - music: synthesized (default) or a supplied licensed track
 - engine: Remotion (default), HyperFrames (HTML, no React) or Manim (a diagram
@@ -50,10 +58,24 @@ and keep it faithful to the real component.
 
 ## 5. Shotlist → STOP
 
-Pick the archetype (an arc of shots, or a one-shape UI tour) and write
-`shotlist.md` in beats (120 BPM = 15 frames/beat at 30 fps), with motion
-preset and sound cue per shot and one key still per shot, and run its
-checklist. **Show it to the user and wait for approval.** No building before a
+Use the archetype from the brief (arc, one-shape UI tour, high-energy hype or
+calm product demo) and write `shotlist.md` in beats (120 BPM = 15 frames/beat
+at 30 fps), with motion preset and sound cue per shot and one key still per
+shot, and run its checklist plus the archetype's own checks.
+
+- **High-energy hype**, a scene menu (6 strong beat 8 weak): an accent mark
+  that stretches into a line and floods into the name; the name slammed in by
+  masks, its full stop growing into the next scene; the kinetic triplet; one
+  signature visual; one product micro-moment; proof only if brand.json allows
+  it; the signature shape collapsing into the logo for the end card.
+- **Calm product demo**: write every on-screen line first (it's the only
+  voice), then time the chapters against the feature budget. The camera is the
+  editor: push, ride, pull back, glide, or a hard cut on the beat into the UI.
+
+Both come from Barty-Bart/motion-graphics (MIT), translated to the rules here:
+no dissolves, no HUD or frame border, brand roles instead of the source's
+palette and serif/mono trio, `motion(FPS)` presets instead of eased keyframes,
+captured UI instead of rebuilt. **Show it to the user and wait for approval.** No building before a
 yes.
 
 ## 6. Key stills → STOP

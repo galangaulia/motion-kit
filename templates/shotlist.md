@@ -3,9 +3,17 @@
 Written after the brief, **approved before building**. Times are in beats (see
 src/timeline.ts); 4 beats = 1 bar.
 
-Archetype: **arc** (hook → product → proof → CTA, a shot each) | **one-shape UI
-tour** (8–12 states of the real product, one container that never cuts, a
-pointer drives every change, the last frame matches the first so it loops)
+Archetype (keep one; delete the others and their checks below):
+- **arc**: hook → product → proof → CTA, a shot each.
+- **one-shape UI tour**: 8–12 states of the real product in one container that
+  never cuts; a pointer drives every change, and the last frame matches the
+  first so it loops.
+- **high-energy hype** (12–20 s): 6–8 scenes of 1.5–3 s on a 120–140 BPM grid,
+  each handed to the next through a shape, with the value line as a kinetic
+  triplet.
+- **calm product demo** (45–90 s): one short line at a time; the camera pushes
+  into it, cuts to the real UI up close while it's used, then pulls back and
+  glides to the next feature chapter.
 
 | # | Beats | On screen | Motion (preset) | Sound cue | Into next shot | Key still (beat) |
 |---|---|---|---|---|---|---|
@@ -26,3 +34,31 @@ Checks before asking for approval:
 - [ ] In 9:16, words, the product and the CTA sit inside the safe zone (the outline on phone.png)
 - [ ] The end card is built from what came before (the container, a word, the logo's own shape), not a fresh slide
 - [ ] Every on-screen claim is allowed by the brand's proof rules
+
+Checks the archetype adds:
+
+*arc*
+- [ ] One shot per job in the brief's arc; no proof shot when brand.json allows none
+
+*one-shape UI tour*
+- [ ] One container from first frame to last: it changes shape with `track()`, it never cuts
+- [ ] Every change starts from the pointer (`snappy`)
+- [ ] The last frame matches the first, so the loop has no seam
+
+*high-energy hype*
+- [ ] 6–8 scenes, one idea each; the product's name is up by 2 s (the opening mark floods into it by beat 4)
+- [ ] Every scene hands over through a shape: a line or bar that floods into the next background, or a dot from a letter (a full stop, the dot on an i) that grows into the next scene (`Flood` from that point). A hard cut on a downbeat at most twice
+- [ ] The value line is a kinetic triplet: three words, two beats each (three for a two-word phrase, so it can be read), swapped hard on the beat by masks, landing on `heavy` with no overshoot. Backgrounds alternate between the brand's roles, never a new colour
+- [ ] One signature visual for the product's idea, built from the brand's own shapes (no particle bursts, confetti or glow)
+- [ ] One product micro-moment from the captured product (a toggle, the main button, a bar filling), with its real labels
+- [ ] No HUD: no corner brackets, scene counter or timecode (a border around the frame and corner captions are banned)
+- [ ] Every flood has an impact cue and every carried hand-over a whoosh in build-audio.mjs
+
+*calm product demo*
+- [ ] Features budgeted by length: 45 s → 2–3, 60 s → 3–4, 90 s → 4–5 (about 9–12 s each). Proof or integrations only when there's room (one at 45–60 s, both at 90 s) and brand.json allows them
+- [ ] Opens on the problem line or the product's empty input, on screen by 2 s; no slow brand intro
+- [ ] One short line or one UI element on screen at a time, never both
+- [ ] Each chapter: title line typed or unmasked (not faded up word by word) → camera push into it with `zoom()` on `heavy`, so the type never overshoots → highlight sweep behind the key word (front edge on `snappy`) → hard cut on the beat to the real UI up close → camera rides with the action (it follows the caret while typing) → pull back to the whole screen → glide to the next title. No dissolves or blur-dissolves
+- [ ] The UI is captured from the real product; anything rebuilt (e.g. text too small at 360 px) is named in the brief
+- [ ] Inside a UI moment something new lands every 2–4 s (a typed line, a step ticking off, a result row), and each result holds long enough to read
+- [ ] The bed is slow and even (100 BPM is 18 frames a beat at 30 fps) and sits under small cues: key ticks, clicks, a tick per finished step
