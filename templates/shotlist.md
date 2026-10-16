@@ -14,6 +14,10 @@ Archetype (keep one; delete the others and their checks below):
 - **calm product demo** (45–90 s): one short line at a time; the camera pushes
   into it, cuts to the real UI up close while it's used, then pulls back and
   glides to the next feature chapter.
+- **one-take journey** (10–30 s, loops): one hero (a knob, a cursor, a file, a
+  message) travels through the product's workflow laid out as stations on one
+  big canvas; each station reacts as it passes, the camera follows without a
+  cut, then pulls out to show the whole course and dives back to the start.
 
 | # | Beats | On screen | Motion (preset) | Sound cue | Into next shot | Key still (beat) |
 |---|---|---|---|---|---|---|
@@ -62,3 +66,14 @@ Checks the archetype adds:
 - [ ] The UI is captured from the real product; anything rebuilt (e.g. text too small at 360 px) is named in the brief
 - [ ] Inside a UI moment something new lands every 2–4 s (a typed line, a step ticking off, a result row), and each result holds long enough to read
 - [ ] The bed is slow and even (100 BPM is 18 frames a beat at 30 fps) and sits under small cues: key ticks, clicks, a tick per finished step
+
+*one-take journey*
+- [ ] One hero from first frame to last; it may change shape for a moment but is never replaced, and it is the brightest thing on screen
+- [ ] 3–6 stations, one per workflow step, each a real element of the product (captured, or named in the brief if rebuilt) that visibly changes because the hero touched it
+- [ ] The first station's label states the point by 2 s; station labels are the only words on screen, and each stays up long enough to read
+- [ ] Every contact lands on the beat (`g.hit`): hops and falls are parabolas solved to land on it, with one gravity for the whole film
+- [ ] The hero squashes on contact and stretches in flight; `playful` only when the hero is a character (a ball, a mascot), `snappy` when it is a piece of interface (a knob, a cursor). Stations react on `snappy` or `default`, never `playful`
+- [ ] No cut anywhere: the camera follows with `track()` and frames each station with `zoom()`, keeping the hero in the middle half of the frame; a grid that moves with the canvas makes the moves read
+- [ ] The payoff (the final result) holds in frame before the launch; the pull-out shows the whole course for about a second, stations reset during that hold, and the dive lands the hero on the first station as the camera arrives
+- [ ] The last frame matches the first; anything that straddles the seam (a landing squash, a sound's tail) is drawn and mixed at both ends
+- [ ] The hero's contacts are the main instrument in build-audio.mjs: a pitched note per contact, rising as the story moves on, a whoosh up on the launch and down on the dive

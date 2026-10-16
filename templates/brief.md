@@ -12,7 +12,7 @@ Fill this before any code. Every later decision gets checked against it.
 <!-- e.g. 1:1 for LinkedIn first, then 9:16. 15–20 s. -->
 
 ## Archetype
-<!-- arc (default) | one-shape UI tour | high-energy hype (12–20 s) | calm product demo (45–90 s, list the features). See templates/shotlist.md. -->
+<!-- arc (default) | one-shape UI tour | high-energy hype (12–20 s) | calm product demo (45–90 s, list the features) | one-take journey (10–30 s, list the workflow in 3–6 steps). See templates/shotlist.md. -->
 
 ## Engine
 <!-- remotion (default) | hyperframes | manim, and why; Manim clips inside the film, if any (docs/engines.md). -->

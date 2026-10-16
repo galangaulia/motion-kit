@@ -26,6 +26,9 @@ call, so the person answers once:
     shape, the value line as a kinetic triplet
   - **calm product demo** (45–90 s): one line at a time, then the real UI up
     close while it's used, a chapter per feature (ask which features)
+  - **one-take journey** (10–30 s, loops): one hero travels through the
+    workflow's stations without a cut, then the camera pulls out to show the
+    whole course (ask for the workflow in 3–6 steps)
 - reference film or frame to learn from (optional, strongly encouraged)
 - music: synthesized (default) or a supplied licensed track
 - engine: Remotion (default), HyperFrames (HTML, no React) or Manim (a diagram
@@ -58,8 +61,8 @@ and keep it faithful to the real component.
 
 ## 5. Shotlist → STOP
 
-Use the archetype from the brief (arc, one-shape UI tour, high-energy hype or
-calm product demo) and write `shotlist.md` in beats (120 BPM = 15 frames/beat
+Use the archetype from the brief (arc, one-shape UI tour, high-energy hype,
+calm product demo or one-take journey) and write `shotlist.md` in beats (120 BPM = 15 frames/beat
 at 30 fps), with motion preset and sound cue per shot and one key still per
 shot, and run its checklist plus the archetype's own checks.
 
@@ -71,8 +74,16 @@ shot, and run its checklist plus the archetype's own checks.
 - **Calm product demo**: write every on-screen line first (it's the only
   voice), then time the chapters against the feature budget. The camera is the
   editor: push, ride, pull back, glide, or a hard cut on the beat into the UI.
+- **One-take journey**: pick the hero first (a knob, a cursor, a file, a
+  message: something that fits every station), then map each workflow step to
+  a station that reacts to it (a toggle switches, a slider counts up, a stack
+  of notifications pops in one by one, keys press and type, a deploy button
+  launches it). Lay the stations out on one canvas about 3× the frame, in the
+  order the hero visits them, so falls go down and launches go up. Write the
+  station labels as the story, in the product's own words. Use a row per
+  contact in the shotlist, since every contact is a beat.
 
-Both come from Barty-Bart/motion-graphics (MIT), translated to the rules here:
+The last three come from Barty-Bart/motion-graphics (MIT), translated to the rules here:
 no dissolves, no HUD or frame border, brand roles instead of the source's
 palette and serif/mono trio, `motion(FPS)` presets instead of eased keyframes,
 captured UI instead of rebuilt. **Show it to the user and wait for approval.** No building before a
@@ -103,7 +114,10 @@ and wait for approval of the look.** No animating the rest before a yes.
   drag lets go, `Flood` (Remotion) to change shots without a dissolve. Manim has
   the same helpers in snake_case (`swap_alpha`, `track_velocity`). Lay out from
   the format's size (`useVideoConfig()`, the page root's size, `self.film`) so
-  every format reframes instead of cropping.
+  every format reframes instead of cropping. `docs/techniques.md` has the
+  recipes the archetypes lean on: the camera wrapper, riding along with typing,
+  kinetic type, a dot that floods into the next scene, a hero's hops landing on
+  the beat, a slow-motion launch, the pointer's press, loop seams.
 - Manim clips: `manim/<name>.py` with `class Clip(FrameScene)`, placed with
   `<Clip>` (Remotion) or `{{clip:<name>}}` (HyperFrames); `npm run render`
   builds them first. A transparent webm from outside the kit (a cut-out of real
