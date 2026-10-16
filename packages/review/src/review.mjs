@@ -12,12 +12,17 @@
 //                frames carry the outline of the area the apps' UI leaves clear
 //   report.md    motion checks on the rendered video (glitches, snaps, cuts against
 //                the beat, freezes, stretches with no new picture, flashes), loudness,
-//                sample and true peak, clipping, per-cue lift over the bed, and the
+//                sample and true peak, clipping, per-cue lift over the bed, how well
+//                the music's own kicks line up with the declared beat grid, and the
 //                scorecard to fill in (CLAUDE.md "Review loop")
 //   flags.png    the frames before, at and after each moment the motion checks flag
 //
 // --strict exits 1 (after writing everything) when the film flashes past WCAG
-// 2.3.1 or its true peak is over −1 dBTP. The other checks only inform the critic.
+// 2.3.1, its true peak is over −1 dBTP, or the music is audibly off the beat grid
+// (median kick offset over a quarter of a beat, with most beats found). Synthesized
+// music lines up by construction; this only ever fires for a bought or licensed
+// track whose real tempo drifted from the declared BPM. The other checks only
+// inform the critic.
 //
 // --stills is the key-stills gate (CLAUDE.md, gate 2b): it renders only the frames
 // in src/timeline.ts's STILLS (or --frames) into out/review/<stamp>-<comp>-stills/:
@@ -36,7 +41,7 @@ import { tmpdir } from 'node:os'
 import { pathToFileURL } from 'node:url'
 import { join, resolve } from 'node:path'
 import { parseArgs } from 'node:util'
-import { integratedLufs, peakDb, readWav, truePeakDb } from '@motion-kit/audio'
+import { beatAlignment, integratedLufs, peakDb, readWav, truePeakDb } from '@motion-kit/audio'
 import { checkSize, decodeFrames, extractAudio, probe } from '@motion-kit/media'
 import sharp from 'sharp'
 import { flaggedFrames, flashFailed, motionChecks, motionReport } from './motion-checks.mjs'
@@ -244,6 +249,7 @@ await adapter.close()
 
 let audio = '_No video given (`--video`), so no sound check._'
 let truePeak = null
+let beatAlign = null
 if (hasVideo) {
   const wav = join(tmp, 'mix.wav')
   if (!extractAudio(args.video, wav, 48000)) {
@@ -277,6 +283,29 @@ if (hasVideo) {
         '\n\nEach cue should rise clearly above the bed\'s floor just before it (≈ +4 dB or more), exactly at its frame.\n\n' +
         '| Cue | Frame | Bed floor before (dBFS) | Peak after (dBFS) | Lift (dB) |\n|---|---|---|---|---|\n' +
         lift.join('\n')
+    }
+
+    // Does the music's own beat line up with the grid the picture was cut
+    // to? Synthesized music is correct by construction; this earns its keep
+    // on a bought or licensed track, whose tempo might not exactly match.
+    if (beatGrid) {
+      const totalBeats = Math.floor(beatGrid.at(total))
+      beatAlign = beatAlignment(mix, sr, beatGrid, { to: totalBeats })
+      const perBeatMs = (beatGrid.perBeat / beatGrid.fps) * 1000
+      const found = beatAlign.beats.length - beatAlign.missing.length
+      audio += `\n\n**Beat alignment** — ${found}/${beatAlign.beats.length} beats of the grid found in the mix`
+      if (beatAlign.medianErrorMs === null) {
+        audio += '. No kicks found near any beat: is this the right track, or does it have an audible beat at all?'
+      } else {
+        const sign = beatAlign.medianErrorMs >= 0 ? '+' : ''
+        audio += `, median ${sign}${beatAlign.medianErrorMs.toFixed(0)} ms off, worst ${beatAlign.maxErrorMs.toFixed(0)} ms.`
+        if (Math.abs(beatAlign.medianErrorMs) > perBeatMs * 0.15) {
+          const dir = beatAlign.medianErrorMs > 0 ? 'late' : 'early'
+          audio += ` Consistently ${dir} — shift the grid's \`offset\` by ${beatAlign.suggestedOffsetFrames} frame${Math.abs(beatAlign.suggestedOffsetFrames) === 1 ? '' : 's'}, or check the track's real tempo against the declared BPM.`
+        }
+      }
+    } else {
+      audio += `\n\n_${beatNote || 'No beat grid to check the music against.'}_`
     }
   }
 }
@@ -407,6 +436,12 @@ if (args.strict) {
   if (!hasVideo) fails.push('no --video to check')
   if (motionResult && flashFailed(motionResult)) fails.push('flashes past WCAG 2.3.1 (see report.md)')
   if (truePeak !== null && truePeak > -1) fails.push(`true peak ${truePeak.toFixed(1)} dBTP, over −1`)
+  if (beatAlign && beatAlign.medianErrorMs !== null && beatAlign.confidence >= 0.5) {
+    const perBeatMs = (beatGrid.perBeat / beatGrid.fps) * 1000
+    if (Math.abs(beatAlign.medianErrorMs) > perBeatMs * 0.25) {
+      fails.push(`soundtrack ${beatAlign.medianErrorMs.toFixed(0)} ms off the beat grid (see report.md)`)
+    }
+  }
   if (fails.length) {
     console.error(`strict: ${fails.join('; ')}`)
     process.exitCode = 1

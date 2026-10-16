@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { mkdtempSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { SR, TAU, buffer, integratedLufs, limit, mixdown, noise, peakDb, pluck, readWav, truePeakDb, writeWav } from './src/index.mjs'
+import { SR, TAU, beatAlignment, buffer, integratedLufs, limit, mixdown, noise, peakDb, pluck, readWav, thump, truePeakDb, writeWav } from './src/index.mjs'
 
 const close = (a, b, eps, msg) => assert.ok(Math.abs(a - b) <= eps, `${msg}: ${a} vs ${b}`)
 
@@ -70,5 +70,44 @@ writeWav(path, master)
 const back = readWav(path)
 assert.equal(back[0].length, master[0].length)
 close(back[0][1000], master[0][1000], 1 / 16000, 'wav round trip')
+
+// Beat alignment: a minimal BeatGrid, duck-typed like @motion-kit/core/beats
+// makes (this package stays dependency-free, so it isn't imported directly).
+function testGrid(bpm, fps, offset = 0) {
+  const perBeat = (60 / bpm) * fps
+  return { bpm, fps, offset, perBeat, seconds: (n) => (offset + n * perBeat) / fps, at: (frame) => (frame - offset) / perBeat }
+}
+
+// Eight kicks exactly on a 120 BPM / 30 fps grid: every beat found, near zero error.
+{
+  const g = testGrid(120, 30)
+  const buf = buffer(4)
+  for (let n = 0; n < 8; n++) thump(buf, g.seconds(n), 1)
+  const r = beatAlignment(buf, SR, g, { to: 8 })
+  assert.equal(r.missing.length, 0, `all 8 beats should be found: missing ${r.missing}`)
+  close(r.medianErrorMs, 0, 8, 'on-grid median error')
+  close(r.suggestedOffsetFrames, 0, 0, 'on-grid suggested offset')
+}
+
+// The same kicks, all 30 ms late (a licensed track whose tempo doesn't quite
+// match the grid): the error and the suggested frame shift should say so.
+{
+  const g = testGrid(120, 30)
+  const buf = buffer(4)
+  for (let n = 0; n < 8; n++) thump(buf, g.seconds(n) + 0.03, 1)
+  const r = beatAlignment(buf, SR, g, { to: 8 })
+  assert.equal(r.missing.length, 0, `all 8 beats should still be found: missing ${r.missing}`)
+  close(r.medianErrorMs, 30, 8, 'shifted median error')
+  assert.equal(r.suggestedOffsetFrames, Math.round((30 / 1000) * 30), 'shifted suggested offset in frames')
+}
+
+// Silence: nothing to find, zero confidence, every beat missing.
+{
+  const g = testGrid(120, 30)
+  const r = beatAlignment(buffer(4), SR, g, { to: 8 })
+  assert.equal(r.missing.length, 8, 'silence has no beats to find')
+  assert.equal(r.confidence, 0, 'silence has zero confidence')
+  assert.equal(r.medianErrorMs, null, 'silence has no median error')
+}
 
 console.log('audio: ok')
