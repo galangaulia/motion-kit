@@ -75,8 +75,11 @@ const cues = [
 const { master, report } = mixdown({ duration: TOTAL_FRAMES / FPS, fps: FPS, bed: bed(), bedGain: 0.45, cues, lufs: -14 })
 
 rmSync(OUT, { recursive: true, force: true })
-mkdirSync(OUT, { recursive: true })
+mkdirSync(join(OUT, 'cues'), { recursive: true })
 writeWav(join(OUT, 'soundtrack.wav'), master)
 writeFileSync(join(OUT, 'cues.json'), JSON.stringify({ fps: FPS, ...report }, null, 2))
 writeFileSync(join(OUT, 'sources.json'), JSON.stringify(SOURCES, null, 2))
+// Each cue alone, dry, numbered to match cues.json — so motion-review's
+// sound.html can play one hit without the bed or the ones around it.
+cues.forEach((c, i) => writeWav(join(OUT, 'cues', `${String(i).padStart(2, '0')}-${c.name.replace(/[^a-z0-9-]/gi, '-')}.wav`), c.buf))
 console.log(`soundtrack.wav  ${report.lufs.toFixed(1)} LUFS  peak ${report.peak.toFixed(1)} dBFS  ${report.cues.length} cues`)

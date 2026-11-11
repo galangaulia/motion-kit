@@ -110,3 +110,9 @@ push up; keep it at −1 dBTP or below). Every cue should rise about **+4 dB or
 more** above the bed just before it. A cue under that won't be heard; raise its
 gain, shorten the sound before it, or drop it. The film must also work muted:
 every message on screen.
+
+`npm run audio` also writes each cue's dry clip to `public/audio/cues/`
+(numbered to match `cues.json`), so `npm run review`'s `sound.html` can play
+one hit on its own, next to the same cue heard in the mix — useful when the
+lift number looks fine but the sound itself is wrong, or two cues nearby are
+hard to tell apart by ear alone.

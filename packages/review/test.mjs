@@ -5,6 +5,7 @@ import { grid } from '../core/src/beats.ts'
 import { checkSize } from '@motion-kit/media'
 import { flaggedFrames, flashFailed, motionChecks, motionReport, onBeat } from './src/motion-checks.mjs'
 import { isStoryFormat, safeOutline, safeOutlineSvg } from './src/safe-zones.mjs'
+import { soundReportHtml } from './src/sound-report.mjs'
 import { checkSources, creditsText } from './src/sound-sources.mjs'
 
 const near = (got, want, tol, label) => assert.ok(Math.abs(got - want) <= tol, `${label}: got ${got}, want ${want}`)
@@ -206,6 +207,24 @@ for (const fps of [30, 60]) {
   assert.match(credits, /^Sound in launch\n/)
   assert.match(credits, /- music: "Morning Light" by A\. Composer, CC0 1\.0\. https:\/\/example\.com\/track\/1/)
   assert.match(credits, /- sound: "Swish"/, 'an unknown kind reads as sound')
+}
+
+// ── Sound — cue audition page ──────────────────────────────────────────
+
+{
+  const html = soundReportHtml({
+    cues: [
+      { name: 'whoosh', time: 1.3, lift: 4.8, clip: 'sound/03-whoosh.wav' },
+      { name: '<raw>', time: 0, lift: null, clip: null },
+    ],
+    mix: 'sound/mix.wav',
+  })
+  assert.match(html, /<audio id=mix[^>]*src="sound\/mix\.wav">/, 'the full mix is embedded')
+  assert.match(html, /seek\(1\.3\)/, 'a cue seeks the mix to its own time')
+  assert.match(html, /\+4\.8 dB/, 'a positive lift keeps its sign')
+  assert.match(html, /<audio controls preload=none src="sound\/03-whoosh\.wav">/, "a cue's dry clip is embedded")
+  assert.match(html, /no dry clip/, 'a cue with no clip says so instead of a broken <audio>')
+  assert.doesNotMatch(html, /<raw>/, 'a cue name is escaped')
 }
 
 console.log('review: ok')

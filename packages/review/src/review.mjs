@@ -16,6 +16,9 @@
 //                the music's own kicks line up with the declared beat grid, the
 //                licence of any sound from outside the kit (public/audio/sources.json),
 //                and the scorecard to fill in (CLAUDE.md "Review loop")
+//   sound.html   every cue, clickable: hear it in the mix, and alone when
+//                build-audio.mjs wrote its dry clip to public/audio/cues/
+//                (only when there's a video and cues.json)
 //   flags.png    the frames before, at and after each moment the motion checks flag
 //   CREDITS.txt  the outside sound, for the post's description (only when there is some)
 //
@@ -37,17 +40,18 @@
 // read from their render (--comp is a format in src/formats.ts, --video is needed
 // for the sheets) and render key stills themselves.
 
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs'
+import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { tmpdir } from 'node:os'
 import { pathToFileURL } from 'node:url'
-import { basename, join, resolve } from 'node:path'
+import { basename, dirname, join, resolve } from 'node:path'
 import { parseArgs } from 'node:util'
-import { beatAlignment, integratedLufs, peakDb, readWav, truePeakDb } from '@motion-kit/audio'
+import { beatAlignment, integratedLufs, peakDb, readWav, truePeakDb, writeWav } from '@motion-kit/audio'
 import { checkSize, decodeFrames, extractAudio, probe } from '@motion-kit/media'
 import sharp from 'sharp'
 import { flaggedFrames, flashFailed, motionChecks, motionReport } from './motion-checks.mjs'
 import { isStoryFormat, safeOutlineSvg } from './safe-zones.mjs'
+import { soundReportHtml } from './sound-report.mjs'
 import { checkSources, creditsText } from './sound-sources.mjs'
 
 const { values: args } = parseArgs({
@@ -276,17 +280,35 @@ if (hasVideo) {
 
     if (existsSync(args.cues)) {
       const { cues } = JSON.parse(readFileSync(args.cues, 'utf8'))
-      const lift = cues.map(({ name, frame }) => {
+      // Dry clips build-audio.mjs wrote next to cues.json, one per cue in the
+      // same order, numbered so duplicate names (two "whoosh") don't collide.
+      const cuesDir = join(dirname(args.cues), 'cues')
+      const rows = cues.map(({ name, frame }, i) => {
         // The bed's floor just before the cue (quietest of the 8 frames before), so a
         // cue in a fast run is measured against the music, not the previous cue.
-        const before = Math.min(...Array.from({ length: 8 }, (_, i) => framePeak(frame - 1 - i)))
-        const after = Math.max(...Array.from({ length: 8 }, (_, i) => framePeak(frame + i)))
-        return `| ${name} | ${frame} | ${before.toFixed(1)} | ${after.toFixed(1)} | ${(after - before).toFixed(1)} |`
+        // Clamped to the video's own frames: a cue near the very start or end
+        // read past them (frame -1, or past `total`) as silence either way.
+        const before = Math.min(...Array.from({ length: 8 }, (_, j) => framePeak(Math.max(0, frame - 1 - j))))
+        const after = Math.max(...Array.from({ length: 8 }, (_, j) => framePeak(Math.min(total - 1, frame + j))))
+        const clip = join(cuesDir, `${String(i).padStart(2, '0')}-${name.replace(/[^a-z0-9-]/gi, '-')}.wav`)
+        return { name, frame, time: frame / fps, before, after, lift: after - before, clip: existsSync(clip) ? clip : null }
       })
       audio +=
         '\n\nEach cue should rise clearly above the bed\'s floor just before it (≈ +4 dB or more), exactly at its frame.\n\n' +
         '| Cue | Frame | Bed floor before (dBFS) | Peak after (dBFS) | Lift (dB) |\n|---|---|---|---|---|\n' +
-        lift.join('\n')
+        rows.map((r) => `| ${r.name} | ${r.frame} | ${r.before.toFixed(1)} | ${r.after.toFixed(1)} | ${r.lift.toFixed(1)} |`).join('\n')
+
+      // A page to actually hear each cue: in context (seeking the mix) and alone,
+      // when build-audio.mjs wrote its dry clip.
+      mkdirSync(join(OUT, 'sound'), { recursive: true })
+      writeWav(join(OUT, 'sound', 'mix.wav'), mix, sr)
+      const soundRows = rows.map((r) => {
+        const clip = r.clip ? `sound/${basename(r.clip)}` : null
+        if (r.clip) copyFileSync(r.clip, join(OUT, 'sound', basename(r.clip)))
+        return { name: r.name, time: r.time, lift: r.lift, clip }
+      })
+      writeFileSync(join(OUT, 'sound.html'), soundReportHtml({ cues: soundRows, mix: 'sound/mix.wav' }))
+      audio += '\n\nListen to every cue, in context and alone: `sound.html`.'
     }
 
     // Does the music's own beat line up with the grid the picture was cut
