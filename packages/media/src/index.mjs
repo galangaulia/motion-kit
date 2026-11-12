@@ -43,6 +43,29 @@ export function checkSize(width, height, short = 64) {
 }
 
 /**
+ * The `select` expression for frame numbers `wanted` (sorted, no repeats).
+ * ffmpeg refuses a flat sum of more than 100 terms ("Error while parsing
+ * expression"), and a long film's contact sheet asks for more than that. So consecutive frames become one
+ * `between()` and the terms are summed as a balanced tree: the nesting grows
+ * with log2 of the count (18,000 single frames parse in one pass).
+ */
+export function selectExpr(wanted) {
+  const terms = []
+  for (let i = 0; i < wanted.length; ) {
+    let j = i
+    while (j + 1 < wanted.length && wanted[j + 1] === wanted[j] + 1) j++
+    terms.push(j === i ? `eq(n\\,${wanted[i]})` : `between(n\\,${wanted[i]}\\,${wanted[j]})`)
+    i = j + 1
+  }
+  const sum = (from, to) => {
+    if (to - from <= 8) return terms.slice(from, to).join('+')
+    const mid = (from + to) >> 1
+    return `(${sum(from, mid)})+(${sum(mid, to)})`
+  }
+  return sum(0, terms.length)
+}
+
+/**
  * Frames `frames` of a video as rgb24 at `width` × `height`, one Uint8Array each
  * in the order asked, from a single pass over the video (a `still()` per frame
  * decodes from the start every time). With `select` in the build only those frames
@@ -53,7 +76,7 @@ export function pickFrames(video, frames, width, height, { select = has('filters
   const wanted = [...new Set(frames)].sort((a, b) => a - b)
   if (!wanted.length) return Promise.resolve([])
   const filters = [`trim=end_frame=${wanted.at(-1) + 1}`]
-  if (select) filters.push(`select=${wanted.map((f) => `eq(n\\,${f})`).join('+')}`)
+  if (select) filters.push(`select=${selectExpr(wanted)}`)
   filters.push(`scale=${width}:${height}:flags=area`)
   const { cmd, pre } = tool('ffmpeg')
   const child = spawn(cmd, [

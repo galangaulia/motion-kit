@@ -6,7 +6,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { crc32, deflateSync } from 'node:zlib'
 import { buffer, writeWav } from '../audio/src/index.mjs'
-import { checkSize, decodeFrames, encode, extractAudio, has, mux, pickFrames, probe, run, still, tool } from './src/index.mjs'
+import { checkSize, decodeFrames, encode, extractAudio, has, mux, pickFrames, probe, run, selectExpr, still, tool } from './src/index.mjs'
 
 const tmp = mkdtempSync(join(tmpdir(), 'media-test-'))
 process.on('exit', () => rmSync(tmp, { recursive: true, force: true }))
@@ -74,6 +74,29 @@ for (const select of [...(has('filters', 'select') ? [true] : []), false]) {
   await assert.rejects(pickFrames(clip, [3, N + 2], 32, 18, { select }), /has no frame 14/, `a frame past the end is an error (select: ${select})`)
 }
 assert.deepEqual(await pickFrames(clip, [], 32, 18), [], 'nothing asked, nothing decoded')
+
+// A long film: ffmpeg refuses a `select` sum of more than 100 terms, so 300
+// scattered frames (and a run of 300 in a row) must still come back in one pass.
+// Frame i is told apart by two greys: i % 40 on the left, ⌊i / 40⌋ on the right.
+const LONG = 600
+mkdirSync(join(tmp, 'long'))
+for (let i = 0; i < LONG; i++) writeFileSync(join(tmp, 'long', `${String(i).padStart(3, '0')}.png`), png(W, H, (x) => { const v = x < W / 2 ? (i % 40) * 6 : Math.floor(i / 40) * 15; return [v, v, v] }))
+const long = join(tmp, 'long.mp4')
+encode({ input: join(tmp, 'long', '%03d.png'), output: long, fps: 30, crf: 0 })
+const scattered = Array.from({ length: 300 }, (_, k) => (k * 7) % LONG) // 300 distinct frames, out of order
+const run300 = Array.from({ length: 300 }, (_, k) => 150 + k)
+assert.ok(selectExpr(scattered.toSorted((a, b) => a - b)).split('+').length > 100, 'the scattered ask is past the flat-sum limit')
+assert.equal(selectExpr(run300), 'between(n\\,150\\,449)', 'a run of frames is one term')
+for (const select of [...(has('filters', 'select') ? [true] : []), false]) {
+  for (const [what, ask] of [['300 scattered', scattered], ['300 in a row', run300]]) {
+    const picked = await pickFrames(long, ask, 32, 18, { select })
+    assert.equal(picked.length, ask.length, `${what} (select: ${select}): one frame per ask`)
+    ask.forEach((i, k) => {
+      near(picked[k][(9 * 32 + 2) * 3], (i % 40) * 6, 3, `${what}: frame ${i} left (select: ${select})`)
+      near(picked[k][(9 * 32 + 29) * 3], Math.floor(i / 40) * 15, 3, `${what}: frame ${i} right (select: ${select})`)
+    })
+  }
+}
 
 const one = still(clip, 7, 32, 18)
 assert.deepEqual([...one.subarray(1, 4)].map((c) => String.fromCharCode(c)).join(''), 'PNG')
