@@ -6,7 +6,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { crc32, deflateSync } from 'node:zlib'
 import { buffer, writeWav } from '../audio/src/index.mjs'
-import { checkSize, decodeFrames, encode, extractAudio, has, mux, probe, run, still, tool } from './src/index.mjs'
+import { checkSize, decodeFrames, encode, extractAudio, has, mux, pickFrames, probe, run, still, tool } from './src/index.mjs'
 
 const tmp = mkdtempSync(join(tmpdir(), 'media-test-'))
 process.on('exit', () => rmSync(tmp, { recursive: true, force: true }))
@@ -62,6 +62,18 @@ GREEN.forEach((v, c) => near(g[c], v, 4, `green channel ${c} (BT.709 both ways)`
 const range = decodeFrames(clip, W, H, { from: 3, to: 5 })
 assert.equal(range.length, 3, 'a trimmed range decodes exactly those frames')
 near(px(range[0], 4, 18)[0], 60, 3, 'range starts on frame 3')
+
+// Picked frames, in one pass: in the order asked, repeats allowed, the same
+// with `select` and without it (Remotion's build has none).
+for (const select of [...(has('filters', 'select') ? [true] : []), false]) {
+  const picked = await pickFrames(clip, [7, 2, 11, 2], 32, 18, { select })
+  assert.equal(picked.length, 4, `pickFrames (select: ${select}) returns one frame per ask`)
+  const px32 = (f) => f[(9 * 32 + 2) * 3]
+  ;[7, 2, 11, 2].forEach((i, k) => near(px32(picked[k]), i * 20, 3, `picked frame ${i} (select: ${select})`))
+  assert.equal(picked[0].length, 32 * 18 * 3, 'picked frames are rgb24 at the asked size')
+  await assert.rejects(pickFrames(clip, [3, N + 2], 32, 18, { select }), /has no frame 14/, `a frame past the end is an error (select: ${select})`)
+}
+assert.deepEqual(await pickFrames(clip, [], 32, 18), [], 'nothing asked, nothing decoded')
 
 const one = still(clip, 7, 32, 18)
 assert.deepEqual([...one.subarray(1, 4)].map((c) => String.fromCharCode(c)).join(''), 'PNG')

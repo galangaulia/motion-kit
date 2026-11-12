@@ -7,6 +7,7 @@ import { flaggedFrames, flashFailed, motionChecks, motionReport, onBeat } from '
 import { isStoryFormat, safeOutline, safeOutlineSvg } from './src/safe-zones.mjs'
 import { soundReportHtml } from './src/sound-report.mjs'
 import { checkSources, creditsText } from './src/sound-sources.mjs'
+import { guessMeta, tileLine, whyNotVideo } from './src/tiles.mjs'
 
 const near = (got, want, tol, label) => assert.ok(Math.abs(got - want) <= tol, `${label}: got ${got}, want ${want}`)
 
@@ -225,6 +226,44 @@ for (const fps of [30, 60]) {
   assert.match(html, /<audio controls preload=none src="sound\/03-whoosh\.wav">/, "a cue's dry clip is embedded")
   assert.match(html, /no dry clip/, 'a cue with no clip says so instead of a broken <audio>')
   assert.doesNotMatch(html, /<raw>/, 'a cue name is escaped')
+}
+
+// ── Where the sheets' tiles come from ─────────────────────────────────
+
+{
+  const meta = { fps: 30, width: 540, height: 960, durationInFrames: 1650 }
+  const full = { width: 1080, height: 1920, fps: 30, frames: 1650 }
+  const preview = { width: 270, height: 480, fps: 30, frames: 1650 }
+  const why = (info, tileWidth, extra = {}) =>
+    whyNotVideo({ video: 'out/film.mp4', info, meta, stale: false, tileWidth, fromSource: true, ...extra })
+
+  // A full render serves every sheet; a --scale=0.5 preview only tiles up to its own width.
+  assert.equal(why(full, 270), null, 'a full render supplies contact.png')
+  assert.equal(why(full, 360), null, 'and phone.png')
+  assert.equal(why(preview, 270), null, 'a 270 px preview supplies 270 px contact tiles')
+  assert.match(why(preview, 360), /270 px wide, the tiles 360/, "but phone.png's 360 px tiles come from source")
+  assert.equal(why(preview, 360, { fromSource: false }), null, 'an engine with no source cuts them from the video anyway')
+
+  // Anything that says the video isn't this cut of this composition sends it all to source.
+  assert.match(why(full, 270, { video: null, info: null }), /no `--video`/)
+  assert.match(why(full, 270, { stale: true }), /changed after `out\/film\.mp4` was rendered/)
+  assert.match(why({ ...full, frames: 1649 }, 270), /1649 frames, the composition 1650/)
+  assert.match(why({ ...full, frames: NaN }, 270), /doesn't say how many frames/)
+  assert.match(why({ ...full, fps: 25 }, 270), /25 fps, the composition at 30/)
+  assert.match(why({ ...full, width: 1920, height: 1080 }, 270), /1920×1080, the composition 540×960/)
+
+  assert.equal(tileLine('contact.png', null, { video: 'out/film.mp4', info: full, fromSource: true }), '- `contact.png`: cut from `out/film.mp4` (1080×1920)')
+  assert.match(tileLine('phone.png', why(preview, 360), { video: 'out/film.mp4', info: preview, fromSource: true }), /^- `phone\.png`: rendered from source \(/)
+  assert.match(tileLine('phone.png', 'x', { fromSource: false }), /cut from the video one frame at a time \(x\)/)
+
+  // Remotion's guess, so it needn't bundle: rate and length from the timeline, size at half scale.
+  const timeline = { FPS: 30, TOTAL_FRAMES: 1650 }
+  assert.deepEqual(guessMeta(timeline, full), meta, 'a 1080×1920 render of a 540×960 film')
+  assert.deepEqual(guessMeta(timeline, preview), meta, 'a 270×480 preview of the same film')
+  assert.deepEqual(guessMeta(timeline, { width: 1920, height: 1080 }), { fps: 30, durationInFrames: 1650, width: 960, height: 540 })
+  assert.equal(guessMeta(timeline, null), null, 'no video, no guess')
+  assert.equal(guessMeta({ FPS: 30 }, full), null, 'no TOTAL_FRAMES, no guess')
+  assert.equal(guessMeta(null, full), null, "a timeline that didn't load, no guess")
 }
 
 console.log('review: ok')

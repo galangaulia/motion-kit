@@ -2,7 +2,7 @@
 // audio), lay the soundtrack in, and encode a PNG sequence into a delivery MP4.
 // Everything here runs on Remotion's small ffmpeg build too (see ffmpeg.mjs).
 
-import { spawnSync } from 'node:child_process'
+import { spawn, spawnSync } from 'node:child_process'
 import { has, need, run, tool } from './ffmpeg.mjs'
 
 export { has, need, run, tool }
@@ -40,6 +40,56 @@ export function decodeFrames(video, width, height, { from, to } = {}) {
 export function checkSize(width, height, short = 64) {
   const long = Math.max(16, Math.round((short * Math.max(width, height)) / Math.min(width, height) / 16) * 16)
   return width >= height ? { width: long, height: short } : { width: short, height: long }
+}
+
+/**
+ * Frames `frames` of a video as rgb24 at `width` × `height`, one Uint8Array each
+ * in the order asked, from a single pass over the video (a `still()` per frame
+ * decodes from the start every time). With `select` in the build only those frames
+ * are scaled; without it (Remotion's build, or `select: false`) every frame up to
+ * the last one asked for is, and the rest are dropped here as they stream past.
+ */
+export function pickFrames(video, frames, width, height, { select = has('filters', 'select') } = {}) {
+  const wanted = [...new Set(frames)].sort((a, b) => a - b)
+  if (!wanted.length) return Promise.resolve([])
+  const filters = [`trim=end_frame=${wanted.at(-1) + 1}`]
+  if (select) filters.push(`select=${wanted.map((f) => `eq(n\\,${f})`).join('+')}`)
+  filters.push(`scale=${width}:${height}:flags=area`)
+  const { cmd, pre } = tool('ffmpeg')
+  const child = spawn(cmd, [
+    ...pre, '-v', 'error', '-i', video, '-an', '-vf', filters.join(','),
+    '-fps_mode', 'passthrough', '-pix_fmt', 'rgb24', '-c:v', 'rawvideo', '-f', 'image2pipe', '-',
+  ])
+  const size = width * height * 3
+  const keep = new Set(wanted)
+  const got = new Map()
+  let n = 0 // frames out so far: the frame number without select, the place in `wanted` with it
+  let chunks = []
+  let have = 0
+  let errors = ''
+  child.stdout.on('data', (chunk) => {
+    chunks.push(chunk)
+    have += chunk.length
+    if (have < size) return
+    const all = chunks.length === 1 ? chunks[0] : Buffer.concat(chunks, have)
+    let p = 0
+    for (; have - p >= size; p += size, n++) {
+      const frame = select ? wanted[n] : n
+      if (keep.has(frame)) got.set(frame, new Uint8Array(all.subarray(p, p + size)))
+    }
+    chunks = p < have ? [all.subarray(p)] : []
+    have -= p
+  })
+  child.stderr.on('data', (chunk) => (errors += chunk))
+  return new Promise((done, fail) => {
+    child.on('error', fail)
+    child.on('close', (code) => {
+      if (code !== 0) return fail(new Error(`ffmpeg failed: ${errors.trim() || code}`))
+      const missing = wanted.filter((f) => !got.has(f))
+      if (missing.length) return fail(new Error(`${video} has no frame ${missing.join(', ')}`))
+      done(frames.map((f) => got.get(f)))
+    })
+  })
 }
 
 /** One frame of a video as a PNG at `width` × `height` (frame-exact, via `trim`). */

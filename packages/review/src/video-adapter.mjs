@@ -33,6 +33,8 @@ export async function openVideo({ comp, video, timeline, stills, renderStills })
 
   return {
     meta,
+    /** Nothing to draw a frame from but the render: the review cuts tiles from it at any size. */
+    fromSource: false,
     /** Key stills are rendered by the engine in one go, before any is asked for. */
     async prepare(frames) {
       if (stills) rendered = await renderStills(frames, meta)

@@ -36,6 +36,17 @@ for. Scaffold with `npm run new -- <slug> --brand <name>`.
 npm run studio        # Remotion Studio, live
 npm run render        # out/square.mp4 (render:all for every format)
 npm run render:final  # out/final/<slug>-<ratio>.mp4 with motion blur
-npm run review        # stills rendered from source, motion checks from out/square.mp4
-npm run stills        # key stills at 1080
+npm run review        # sheets and motion checks from out/square.mp4 (below)
+npm run stills        # key stills at 1080, rendered from source
 ```
+
+The review cuts `contact.png` (270 px tiles) and `phone.png` (360 px) out of
+the render, one ffmpeg pass per sheet, when the render matches the composition
+(frame count, rate, shape) and nothing in `src/`, `scripts/`, `public/` or
+`manim/` changed after it. A sheet whose tiles are wider than the render is
+rendered from source instead, so nothing is upscaled: a 1080p render serves
+both sheets, a half-scale preview (`remotion render <Comp> out/preview.mp4
+--scale=0.5`, 270×480 for a 540×960 film) serves `contact.png` only. The film
+is bundled and Chrome opened only when some tile needs them; until then the
+composition's rate and length are `FPS` and `TOTAL_FRAMES` from
+`src/timeline.ts`. `report.md` says where each sheet's tiles came from.

@@ -39,6 +39,14 @@
 // them from source (--comp is a composition id); HyperFrames and Manim films are
 // read from their render (--comp is a format in src/formats.ts, --video is needed
 // for the sheets) and render key stills themselves.
+//
+// The sheets are cut from --video, one ffmpeg pass per sheet, when it matches the
+// composition (length, rate, shape) and nothing in src/, scripts/, public/ or manim/
+// changed after it was rendered. Remotion renders from source only the tiles wider
+// than the video, so nothing is upscaled: a --scale=0.5 preview of a 540×960 film is
+// 270 px wide, enough for contact.png, not for phone.png's 360. It bundles the film
+// and opens Chrome only when some tile needs it. report.md says where each sheet's
+// tiles came from. --stills always renders from source.
 
 import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
@@ -47,12 +55,13 @@ import { pathToFileURL } from 'node:url'
 import { basename, dirname, join, resolve } from 'node:path'
 import { parseArgs } from 'node:util'
 import { beatAlignment, integratedLufs, peakDb, readWav, truePeakDb, writeWav } from '@motion-kit/audio'
-import { checkSize, decodeFrames, extractAudio, probe } from '@motion-kit/media'
+import { checkSize, decodeFrames, extractAudio, pickFrames, probe } from '@motion-kit/media'
 import sharp from 'sharp'
 import { flaggedFrames, flashFailed, motionChecks, motionReport } from './motion-checks.mjs'
 import { isStoryFormat, safeOutlineSvg } from './safe-zones.mjs'
 import { soundReportHtml } from './sound-report.mjs'
 import { checkSources, creditsText } from './sound-sources.mjs'
+import { guessMeta, tileLine, whyNotVideo } from './tiles.mjs'
 
 const { values: args } = parseArgs({
   options: {
@@ -90,6 +99,24 @@ const tmp = mkdtempSync(join(tmpdir(), 'motion-review-'))
 process.on('exit', () => rmSync(tmp, { recursive: true, force: true }))
 
 const hasVideo = Boolean(args.video && existsSync(args.video))
+
+/** Latest change to anything under `dirs` (skipping `skip`), in ms. */
+function newest(dirs, skip) {
+  let latest = 0
+  for (const dir of dirs.filter((d) => existsSync(d))) {
+    for (const rel of readdirSync(dir, { recursive: true })) {
+      const path = join(dir, rel)
+      if (!path.startsWith(skip)) latest = Math.max(latest, statSync(path).mtimeMs)
+    }
+  }
+  return latest
+}
+
+// The render, and whether anything it was made from changed after it.
+// public/audio is rebuilt by every `npm run audio`; its sources are in scripts/.
+// manim/ holds the scenes of a film's Manim clips (public/clips is built from them).
+const videoInfo = hasVideo ? probe(args.video) : null
+const stale = hasVideo && newest(['src', 'scripts', 'public', 'manim'], join('public', 'audio')) > statSync(args.video).mtimeMs
 
 // The film's beat grid, from the src/timeline.ts the picture and the soundtrack
 // read (Node strips its types), to say whether a cut lands on a beat.
@@ -130,8 +157,33 @@ const adapter = await (await import(pathToFileURL(enginePath).href)).open({
   stills: args.stills,
   timeline,
   tmp,
+  // Remotion bundles the film just to learn the composition's size, rate and
+  // length. With a render to cut the sheets from, this guess lets it wait.
+  guess: args.stills ? null : guessMeta(timeline, videoInfo),
 })
-const { fps, width, height, durationInFrames: total } = adapter.meta
+
+// Each sheet's tiles are cut from the render, or else drawn by the engine; the
+// reason they aren't cut, per sheet (null: they are).
+const TILE_WIDTHS = { contact: 270, phone: 360 }
+const fromSource = Boolean(adapter.fromSource)
+const whyNot = (meta) =>
+  Object.fromEntries(
+    Object.entries(TILE_WIDTHS).map(([sheet, tileWidth]) => [
+      sheet,
+      whyNotVideo({ video: hasVideo ? args.video : null, info: videoInfo, meta, stale, tileWidth, fromSource }),
+    ]),
+  )
+let meta = adapter.meta
+let guessed = Boolean(adapter.guessed)
+let notCut = args.stills ? null : whyNot(meta)
+// A guess holds only while nothing is rendered from source. Once something is,
+// the film is bundled anyway, and the composition's own numbers decide.
+if (guessed && Object.values(notCut).some(Boolean)) {
+  meta = await adapter.resolveMeta()
+  guessed = false
+  notCut = whyNot(meta)
+}
+const { fps, width, height, durationInFrames: total } = meta
 const safe = args.safe ?? isStoryFormat(width, height)
 
 // Key stills: --frames, or STILLS in timeline.ts (frame numbers, or { frame, label }).
@@ -175,13 +227,21 @@ const label = (text, w, h) =>
       `<text x="8" y="${h - 8}" font-family="Menlo, monospace" font-size="13" fill="#c8cdd9">${escapeXml(text)}</text></svg>`,
   )
 
-async function sheet(frames, scale, cols, file, { overlay, names } = {}) {
-  const tiles = []
-  for (const f of frames) {
-    process.stdout.write(`\r${file}: frame ${f}   `)
-    tiles.push({ frame: f, png: await still(f, scale) })
+async function sheet(frames, scale, cols, file, { overlay, names, cut } = {}) {
+  let tiles = []
+  if (cut) {
+    // The whole sheet in one pass over the render, scaled down like still() does.
+    const raw = { width: Math.round(width * scale), height: Math.round(height * scale), channels: 3 }
+    process.stdout.write(`${file}: cutting…`)
+    const picked = await pickFrames(args.video, frames, raw.width, raw.height)
+    tiles = picked.map((rgb, i) => ({ frame: frames[i], input: Buffer.from(rgb.buffer, rgb.byteOffset, rgb.length), raw }))
+  } else {
+    for (const f of frames) {
+      process.stdout.write(`\r${file}: frame ${f}   `)
+      tiles.push({ frame: f, input: await still(f, scale) })
+    }
   }
-  const { width: w, height: h } = await sharp(tiles[0].png).metadata()
+  const { width: w, height: h } = tiles[0].raw ?? (await sharp(tiles[0].input).metadata())
   const over = overlay ? Buffer.from(overlay(w, h)) : null
   const bar = 22
   const rows = Math.ceil(tiles.length / cols)
@@ -192,14 +252,14 @@ async function sheet(frames, scale, cols, file, { overlay, names } = {}) {
         const top = Math.floor(i / cols) * (h + bar)
         return [
           { input: label(`${names?.has(t.frame) ? `${names.get(t.frame)} · ` : ''}f${t.frame} · ${(t.frame / fps).toFixed(1)}s`, w, bar), left, top },
-          { input: t.png, left, top: top + bar },
+          { input: t.input, ...(t.raw && { raw: t.raw }), left, top: top + bar },
           ...(over ? [{ input: over, left, top: top + bar }] : []),
         ]
       }),
     )
     .png()
     .toFile(join(OUT, file))
-  process.stdout.write(`\r${file}: ${tiles.length} frames\n`)
+  process.stdout.write(`\r${file}: ${tiles.length} frames${cut ? ` cut from ${args.video}` : ''}\n`)
 }
 
 if (args.stills) {
@@ -249,9 +309,12 @@ ${stills.map((s) => `| ${s.label} | ${s.frame} | ${(s.frame / fps).toFixed(2)} s
   process.exit(0)
 }
 
-await sheet(sample(every), 270 / width, 6, 'contact.png')
-await sheet(sample(phoneEvery), 360 / width, 4, 'phone.png', { overlay: safe ? safeOutlineSvg : undefined })
+await sheet(sample(every), TILE_WIDTHS.contact / width, 6, 'contact.png', { cut: !notCut.contact })
+await sheet(sample(phoneEvery), TILE_WIDTHS.phone / width, 4, 'phone.png', { cut: !notCut.phone, overlay: safe ? safeOutlineSvg : undefined })
 await adapter.close()
+const tileLines = Object.keys(TILE_WIDTHS)
+  .map((sheet) => tileLine(`${sheet}.png`, notCut[sheet], { video: args.video, info: videoInfo, fromSource }))
+  .join('\n')
 
 // ── Sound ─────────────────────────────────────────────────────────────
 
@@ -366,23 +429,11 @@ if (existsSync(args.sources)) {
 
 // ── Motion ────────────────────────────────────────────────────────────
 
-/** Latest change to anything under `dirs` (skipping `skip`), in ms. */
-function newest(dirs, skip) {
-  let latest = 0
-  for (const dir of dirs.filter((d) => existsSync(d))) {
-    for (const rel of readdirSync(dir, { recursive: true })) {
-      const path = join(dir, rel)
-      if (!path.startsWith(skip)) latest = Math.max(latest, statSync(path).mtimeMs)
-    }
-  }
-  return latest
-}
-
 let motion = '_No video given (`--video`), so no motion checks._'
 let motionResult = null
 if (hasVideo) {
   console.log('motion checks…')
-  const video = probe(args.video)
+  const video = videoInfo
   const warnings = []
   if (Math.abs(video.width / video.height - width / height) > 0.01) {
     warnings.push(`⚠ \`${args.video}\` is ${video.width}×${video.height} but ${args.comp} is ${width}×${height}: is it the right video?`)
@@ -390,9 +441,7 @@ if (hasVideo) {
   if (Number.isFinite(video.frames) && video.frames !== total) {
     warnings.push(`⚠ \`${args.video}\` has ${video.frames} frames, ${args.comp} has ${total}: render again.`)
   }
-  // public/audio is rebuilt by every `npm run audio`; its sources are in scripts/.
-  // manim/ holds the scenes of a film's Manim clips (public/clips is built from them).
-  if (newest(['src', 'scripts', 'public', 'manim'], join('public', 'audio')) > statSync(args.video).mtimeMs) {
+  if (stale) {
     warnings.push(`⚠ Files in src/, scripts/, public/ or manim/ changed after \`${args.video}\` was rendered: these checks and the sound describe an older cut.`)
   }
 
@@ -439,7 +488,11 @@ writeFileSync(
   join(OUT, 'report.md'),
   `# Review ${stamp} · ${args.comp}
 
-${width}×${height} @ ${fps} fps · ${(total / fps).toFixed(1)} s
+${width}×${height} @ ${fps} fps · ${(total / fps).toFixed(1)} s${
+  guessed ? ' (`FPS` and `TOTAL_FRAMES` from src/timeline.ts, the video at half size: the film wasn\'t bundled)' : ''
+}
+
+${tileLines}
 
 Look at \`contact.png\` (rhythm, variety, composition) and \`phone.png\` (360 px:
 can every word be read?) before scoring.${
